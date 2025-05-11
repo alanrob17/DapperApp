@@ -11,7 +11,6 @@ namespace RecordDB.Repositories
     {
         Task<bool> UpdateArtistAsync(Artist artist);
         Task<bool> UpdateArtistsBandTitlesAsync(Artist artist);
-        Task<IEnumerable<Artist>> GetAllArtistsAsync();
         Task<Artist> GetArtistByIdAsync(int artistId);
         Task<int> CountArtistsAsync();
         Task<IEnumerable<Artist>> GetArtistListAsync(); // get a dropdown list of all artists
@@ -26,6 +25,7 @@ namespace RecordDB.Repositories
         Task<bool> AddArtistAsync(Artist artist);
         Task<bool> AddArtistAsync(string firstName, string lastName, string biography);
         Task<bool> DeleteArtistAsync(int artistId);
+        Task<bool> DeleteArtistAsync(string name);
         Task<IEnumerable<Artist>> GetBandArtistsAsync();
         Task<int> UpdateArtistAsync(int artistId, string firstName, string lastName, string name, string biography);
         Task<bool> CheckForArtistNameAsync(string name);
