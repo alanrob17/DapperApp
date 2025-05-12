@@ -37,6 +37,157 @@ namespace RecordDB.Services
             // await GetArtistByNameAsync("Bob Dylan");
             // await GetArtistIdByNameAsync("Bob", "Dylan");
             // await GetArtistIdFromRecordAsync(5249);
+            // await GetArtistsWithNoBioAsync();
+            // await GetBiographyAsync(114);
+            // await GetNoBiographyCountAsync();
+            // await UpdateArtistAsync(870, "Alan", "Robson", "Alan Robson", "Alan is a Rock music star.");
+            // await UpdateArtistAsync();
+            // await GetBiographyFromRecordIdAsync(5249);
+            // await GetArtistNameFromRecordIdAsync(5249);
+            // await ShowArtistAsync(114);
+            await GetArtistNameAsync(114);
+            await GetAllArtistsAsync();
+        }
+
+        private async Task GetAllArtistsAsync()
+        {
+
+            var artists = await _repository.GetArtistListAsync();
+            foreach (var artist in artists)
+            {
+                var biography = string.Empty;
+                if (artist.Biography != null && artist.Biography.Length > 60)
+                {
+                    biography = artist.Biography.Substring(0, 60);
+                }
+
+                _output.WriteLine($"Id: {artist.ArtistId}, Name: {artist.Name} - {biography}");
+            }
+        }
+
+        private async Task GetArtistNameAsync(int artistId)
+        {
+            var artistName = await _repository.GetArtistNameAsync(artistId);
+            if (!string.IsNullOrEmpty(artistName))
+            {
+                _output.WriteLine($"Artist Name: {artistName}");
+            }
+            else
+            {
+                _output.WriteError($"No artist found for ArtistId: {artistId}");
+            }
+        }
+
+        private async Task ShowArtistAsync(int artistId)
+        {
+            var artist = await _repository.ShowArtistAsync(artistId);
+            if (artist is not null)
+            {
+                var artistHtml = ToHtml(artist);
+                _output.WriteLine(artistHtml);
+            }
+            else
+            {
+                _output.WriteError($"ArtistId: {artistId} not found.");
+            }
+        }
+
+        private async Task GetArtistNameFromRecordIdAsync(int recordId)
+        {
+            var artistName = await _repository.GetArtistNameByRecordIdAsync(recordId);
+            if (!string.IsNullOrEmpty(artistName))
+            {
+                _output.WriteLine($"Artist Name: {artistName}");
+            }
+            else
+            {
+                _output.WriteError($"No artist found for RecordId: {recordId}");
+            }
+        }
+
+        private async Task GetBiographyFromRecordIdAsync(int recordId)
+        {
+            var biography = await _repository.GetBiographyFromRecordIdAsync(recordId);
+            if (!string.IsNullOrEmpty(biography))
+            {
+                _output.WriteLine($"Biography: {biography}");
+            }
+            else
+            {
+                _output.WriteError($"No biography found for RecordId: {recordId}");
+            }
+        }
+
+        private async Task UpdateArtistAsync()
+        {
+            var artistId = 870;
+            var firstName = "Alanzo";
+            var lastName = "Robosono";
+            var name = "Alanzo Robosono";
+            var biography = "Alan is a Rock music star.";
+
+            var updated = await _repository.UpdateArtistAsync(artistId, firstName, lastName, name, biography);
+            if (updated > 0)
+            {
+                _output.WriteLine($"Artist {name} updated successfully.");
+            }
+            else
+            {
+                _output.WriteError($"Failed to update artist {name}.");
+            }
+        }
+
+        private async Task UpdateArtistAsync(int artistId, string firstName, string lastName, string name, string biography)
+        {
+            var artist = new Artist
+            {
+                ArtistId = artistId,
+                FirstName = firstName,
+                LastName = lastName,
+                Name = name,
+                Biography = biography
+            };
+            int updated = await _repository.UpdateArtistAsync(artist);
+            if (updated > 0)
+            {
+                _output.WriteLine($"Artist {artist.Name} updated successfully.");
+            }
+            else
+            {
+                _output.WriteError($"Failed to update artist {artist.Name}.");
+            }
+        }
+
+        private async Task GetNoBiographyCountAsync()
+        {
+            int count = await _repository.GetNoBiographyCountAsync();
+            _output.WriteLine($"Total Artists with no biography: {count}");
+        }
+
+        private async Task GetBiographyAsync(int artistId)
+        {
+            var artist = await _repository.GetBiographyAsync(artistId);
+            if (artist is not null)
+            {
+                var biography = ToHtml(artist);
+                _output.WriteLine(biography);
+            }
+            else
+            {
+                _output.WriteError($"ArtistId: {artistId} not found.");
+            }
+        }
+
+        private async Task GetArtistsWithNoBioAsync()
+        {
+            var artists = await _repository.GetArtistsWithNoBioAsync();
+            
+            _output.WriteLine($"Artists with no biography: {artists.Count()}");
+
+            foreach (var artist in artists)
+            {
+                _output.WriteLine($"Id: {artist.ArtistId}, Name: {artist.Name}");
+            }
         }
 
         private async Task GetArtistIdFromRecordAsync(int recordId)

@@ -9,9 +9,10 @@ namespace RecordDB.Repositories
 {
     public interface IArtistRepository
     {
-        Task<bool> UpdateArtistAsync(Artist artist);
+        Task<int> UpdateArtistAsync(Artist artist);
         Task<bool> UpdateArtistsBandTitlesAsync(Artist artist);
         Task<Artist> GetArtistByIdAsync(int artistId);
+        Task<string> GetArtistNameAsync(int artistId);
         Task<int> CountArtistsAsync();
         Task<IEnumerable<Artist>> GetArtistListAsync(); // get a dropdown list of all artists
         Task<IEnumerable<Artist>> GetArtistsWithNoBioAsync();
@@ -29,5 +30,7 @@ namespace RecordDB.Repositories
         Task<IEnumerable<Artist>> GetBandArtistsAsync();
         Task<int> UpdateArtistAsync(int artistId, string firstName, string lastName, string name, string biography);
         Task<bool> CheckForArtistNameAsync(string name);
+        Task<string> GetArtistNameByRecordIdAsync(int recordId);
+        Task<Artist> ShowArtistAsync(int artistId);
     }
 }

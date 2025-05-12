@@ -9,6 +9,8 @@ using System.Threading.Tasks;
 using System.Data.Common;
 using RecordDB.Data.Interfaces;
 using System.Net.Quic;
+using Microsoft.Data.SqlClient;
+using Microsoft.Win32.SafeHandles;
 
 namespace RecordDB.Repositories
 {
@@ -141,10 +143,36 @@ namespace RecordDB.Repositories
             return await connection.QueryAsync<Artist>("up_ArtistSelectAll", commandType: CommandType.StoredProcedure);
         }
 
+        public async Task<string> GetArtistNameAsync(int artistId)
+        {
+
+            using var connection = _connectionFactory.CreateConnection();
+            var sproc = "up_GetArtistNameByArtistId";
+            var parameters = new DynamicParameters();
+            parameters.Add("@ArtistId", artistId);
+            var name = await connection.ExecuteScalarAsync<string>(sproc, parameters, commandType: CommandType.StoredProcedure);
+
+            return name ?? string.Empty;
+        }
+
+        public async Task<string> GetArtistNameByRecordIdAsync(int recordId)
+        {
+            using var connection = _connectionFactory.CreateConnection();
+            
+            var sproc = "up_GetArtistNameByRecordId";
+            var parameter = new DynamicParameters();
+            parameter.Add("@RecordId", recordId);
+
+            IEnumerable<Artist> artist = await connection.QueryAsync<Artist>(sproc, parameter, commandType: CommandType.StoredProcedure);
+
+            return artist?.FirstOrDefault()?.Name ?? string.Empty;
+        }
+
         public async Task<IEnumerable<Artist>> GetArtistsWithNoBioAsync()
         {
             using var connection = _connectionFactory.CreateConnection();
-            throw new NotImplementedException();
+
+            return await connection.QueryAsync<Artist>("up_selectArtistsWithNoBio", commandType: CommandType.StoredProcedure);
         }
 
         public async Task<IEnumerable<Artist>> GetBandArtistsAsync()
@@ -156,31 +184,75 @@ namespace RecordDB.Repositories
         public async Task<Artist?> GetBiographyAsync(int artistId)
         {
             using var connection = _connectionFactory.CreateConnection();
-            throw new NotImplementedException();
+
+            var sproc = "up_ArtistSelectById";
+            var parameters = new DynamicParameters();
+            parameters.Add("@ArtistId", artistId);
+            return await connection.QueryFirstOrDefaultAsync<Artist>(sproc, parameters, commandType: CommandType.StoredProcedure);
         }
 
         public async Task<string> GetBiographyFromRecordIdAsync(int recordId)
         {
             using var connection = _connectionFactory.CreateConnection();
-            throw new NotImplementedException();
+            
+            var sproc = "up_GetBiography";
+            var parameter = new DynamicParameters();
+            parameter.Add("@RecordId", recordId);
+
+            return await connection.ExecuteScalarAsync<string>(sproc, parameter, commandType: CommandType.StoredProcedure);
         }
 
         public async Task<int> GetNoBiographyCountAsync()
         {
             using var connection = _connectionFactory.CreateConnection();
-            throw new NotImplementedException();
+
+            var sproc = "up_NoBioCount";
+            
+            return await connection.ExecuteScalarAsync<int>(sproc, commandType: CommandType.StoredProcedure);
         }
 
-        public async Task<bool> UpdateArtistAsync(Artist artist)
+        public async Task<Artist> ShowArtistAsync(int artistId)
         {
             using var connection = _connectionFactory.CreateConnection();
-            throw new NotImplementedException();
+            var sproc = "up_ArtistSelectById";
+            var parameter = new DynamicParameters();
+            parameter.Add("@ArtistId", artistId);
+            IEnumerable<Artist> artist = await connection.QueryAsync<Artist>(sproc, parameter, commandType: CommandType.StoredProcedure);
+
+            return artist?.FirstOrDefault() ?? null;
+        }
+
+        public async Task<int> UpdateArtistAsync(Artist artist)
+        {
+            using var connection = _connectionFactory.CreateConnection();
+
+            var sproc = "up_UpdateArtist";
+
+            var parameters = new DynamicParameters();
+            parameters.Add("@ArtistId", artist.ArtistId);
+            parameters.Add("@FirstName", artist.FirstName);
+            parameters.Add("@LastName", artist.LastName);
+            parameters.Add("@Name", artist.Name);
+            parameters.Add("@Biography", artist.Biography);
+            parameters.Add("@Result", dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+
+            return await connection.ExecuteAsync(sproc, parameters, commandType: CommandType.StoredProcedure);
         }
 
         public async Task<int> UpdateArtistAsync(int artistId, string firstName, string lastName, string name, string biography)
         {
             using var connection = _connectionFactory.CreateConnection();
-            throw new NotImplementedException();
+
+            var sproc = "up_UpdateArtist";
+            var parameters = new DynamicParameters();
+            parameters.Add("@ArtistId", artistId);
+            parameters.Add("@FirstName", firstName);
+            parameters.Add("@LastName", lastName);
+            parameters.Add("@Name", name);
+            parameters.Add("@Biography", biography);
+            parameters.Add("@Result", dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
+
+            return await connection.ExecuteAsync(sproc, parameters, commandType: CommandType.StoredProcedure);
         }
 
         public async Task<bool> UpdateArtistsBandTitlesAsync(Artist artist)
