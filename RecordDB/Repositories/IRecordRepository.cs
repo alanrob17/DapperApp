@@ -12,7 +12,7 @@ namespace RecordDB.Repositories
         Task<IEnumerable<Record>> GetAllRecordsAsync();
         Task<Record> GetRecordByIdAsync(int recordId);
         Task<bool> UpdateRecordAsync(Record record);
-        Task<bool> AddRecordAsync(Record record);
+        Task<int> AddRecordAsync(Record record);
         Task<int> AddRecordAsync(int artistId, string name, string field, int recorded, string label, string pressing, string rating, int discs, string media, DateTime bought, decimal cost, string coverName, string review);
         Task<bool> DeleteRecordAsync(int recordId);
         Task<int> CountTotalRecordsAsync();

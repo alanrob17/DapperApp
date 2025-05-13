@@ -37,11 +37,14 @@ namespace RecordDB.Models
         [StringLength(50)]
         public string? Media { get; set; }
 
-        [Column(TypeName = "text")]
-        public string? Bought { get; set; }
+        [Column(TypeName = "datetime")]
+        public DateTime? Bought { get; set; }
 
         [Column(TypeName = "money")]
         public decimal? Cost { get; set; }
+
+        [StringLength(50)]
+        public string? CoverName { get; set; }
 
         [Column(TypeName = "text")]
         public string? Review { get; set; }

@@ -19,14 +19,40 @@ namespace RecordDB.Repositories
             _connectionFactory = connectionFactory;
         }
 
-        public async Task<bool> AddRecordAsync(Record record)
+        public async Task<int> AddRecordAsync(Record record)
         {
-            throw new NotImplementedException();
+            using var connection = _connectionFactory.CreateConnection();
+
+            var parameters = new DynamicParameters();
+
+            parameters.Add("@ArtistId", record.ArtistId);
+            parameters.Add("@Name", record.Name);
+            parameters.Add("@Field", record.Field);
+            parameters.Add("@Recorded", record.Recorded);
+            parameters.Add("@Label", record.Label);
+            parameters.Add("@Pressing", record.Pressing);
+            parameters.Add("@Rating", record.Rating);
+            parameters.Add("@Discs", record.Discs);
+            parameters.Add("@Media", record.Media);
+            parameters.Add("@Bought", record.Bought);
+            parameters.Add("@Cost", record.Cost);
+            parameters.Add("@CoverName", null);
+            parameters.Add("@Review", record.Review);
+            parameters.Add("@RecordId", dbType: DbType.Int32, direction: ParameterDirection.Output);
+
+            await connection.ExecuteAsync("adm_RecordInsert", parameters, commandType: CommandType.StoredProcedure);
+
+            // ExecuteAsync() returns the rows affected. I want the output parameter value
+            return parameters.Get<int>("@RecordId");
         }
         
         public async Task<bool> DeleteRecordAsync(int recordId)
         {
-            throw new NotImplementedException();
+            using var connection = _connectionFactory.CreateConnection();
+            var parameters = new DynamicParameters();
+            parameters.Add("@RecordId", recordId);
+            var rowsAffected = await connection.ExecuteAsync("up_deleteRecord", parameters, commandType: CommandType.StoredProcedure);
+            return rowsAffected > 0;
         }
         
         public async Task<int> CountTotalRecordsAsync()
