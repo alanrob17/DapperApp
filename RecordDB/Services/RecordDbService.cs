@@ -27,7 +27,133 @@ namespace RecordDB.Services
             //await CountTotalRecordsAsync();
             //await GetRecordsByArtistIdAsync(114);
             // await AddNewRecord();
-            await DeleteRecordAsync(5285);
+            // await AddNewRecord(863, "Bass Rebellion", "Rock", 2025, "Wobble Music", "Aus", "***", 1, "CD", DateTime.Now, 19.99m, null, "This is James' second album.");
+            // await DeleteRecordAsync(5285);
+            // await UpdateRecordAsync();
+            // await UpdateRecordAsync(5288, "Rockin' The Bass Again", "Rock", 2023, "Wibble Wobble Music", "Aus", "***", 1, "CD", DateTime.Now, 19.99m, null, "This is James' ninth album.");
+            // await GetArtistRecordsAsync(114);
+            // await GetNoRecordReviewsAsync();
+            // await CountDiscsAsync("****");
+            // await GetArtistNumberOfRecordsAsync(114);
+            await GetRecordByNameAsync("Blonde On Blonde");
+        }
+
+        private async Task GetRecordByNameAsync(string name)
+        {
+            var record = await _repository.GetRecordByNameAsync(name);
+            if (record is not null)
+            {
+                var artistName = await _repository.GetArtistNameFromRecordAsync(record.RecordId);
+                if (artistName is not null)
+                {
+                    _output.WriteLine($"Artist: {artistName} - Record: {record.Name} - {record.Recorded}");
+                }
+                else
+                {
+                    _output.WriteError($"No artist found for record: {name}");
+                }
+            }
+            else
+            {
+                _output.WriteError($"Record: {name} not found.");
+            }
+        }
+
+        private async Task GetArtistNumberOfRecordsAsync(int artistId)
+        {
+            var records = await _repository.GetArtistNumberOfRecordsAsync(artistId);
+            if (records is not null)
+            {
+                _output.WriteLine($"ArtistId: {artistId} - Number of Records: {records}");
+            }
+            else
+            {
+                _output.WriteError($"No records found for ArtistId: {artistId}");
+            }
+        }
+
+        private async Task CountDiscsAsync(string show)
+        {
+
+            var discs = await _repository.CountDiscsAsync(show);
+            _output.WriteLine($"{show}: Total Discs: {discs}");
+        }
+
+        private async Task GetNoRecordReviewsAsync()
+        {
+            var records = await _repository.NoRecordReviewsAsync();
+            foreach (var record in records)
+            {
+                _output.WriteLine($"ArtistId: {record.ArtistId} - Artist: {record.ArtistName} - Record Id: {record.RecordId}: {record.Recorded} - {record.RecordName}");
+            }
+        }
+
+        private async Task GetArtistRecordsAsync(int artistId)
+        {
+
+            var records = await _repository.GetArtistRecordsAsync(artistId);
+            foreach (var record in records)
+            {
+                _output.WriteLine($"Record Id: {record.RecordId}, Name: {record.Name}, Recorded: {record.Recorded}, Media: {record.Media}");
+            }
+        }
+
+        private async Task UpdateRecordAsync(int recordId, string name, string field, int recorded, string label, string pressing, string rating, int discs, string media, DateTime bought, decimal cost, string coverName, string review)
+        {
+            var record = new Record
+            {
+                RecordId = recordId,
+                Name = name,
+                Field = field,
+                Recorded = recorded,
+                Label = label,
+                Pressing = pressing,
+                Rating = rating,
+                Discs = discs,
+                Media = media,
+                Bought = bought,
+                Cost = cost,
+                CoverName = coverName,
+                Review = review
+            };
+            recordId = await _repository.UpdateRecordAsync(record);
+            if (recordId > 0)
+            {
+                _output.WriteLine($"Record Id: {recordId} updated successfully.");
+            }
+            else
+            {
+                _output.WriteError($"Failed to update record with Id: {recordId}.");
+            }
+        }
+
+        private async Task UpdateRecordAsync()
+        {
+            var record = new Record
+            {
+                RecordId = 5288,
+                Name = "Rockin' Bass Rebellion",
+                Field = "Rock",
+                Recorded = 2023,
+                Label = "Wobble Music",
+                Pressing = "Aus",
+                Rating = "***",
+                Discs = 3,
+                Media = "CD",
+                Bought = DateTime.Now,
+                Cost = 29.99m,
+                CoverName = null,
+                Review = "This is James' sixth album."
+            };
+            var recordId = await _repository.UpdateRecordAsync(record);
+            if (recordId > 0)
+            {
+                _output.WriteLine($"Record with ID {record.RecordId} updated successfully.");
+            }
+            else
+            {
+                _output.WriteError($"Failed to update record with ID {record.RecordId}.");
+            }
         }
 
         private async Task DeleteRecordAsync(int recordId)
@@ -47,18 +173,49 @@ namespace RecordDB.Services
         {
             var recordId = await _repository.AddRecordAsync(new Record
             {
+                RecordId = 5288,
                 ArtistId = 863,
-                Name = "Rockin' The Bass",
+                Name = "Rockin' and Rollin' Bass",
                 Field = "Rock",
-                Recorded = 2025,
-                Label = "Wobble Music",
-                Pressing = "Aus",
-                Rating = "***",
-                Discs = 2,
+                Recorded = 2020,
+                Label = "Wobble Dobble Music",
+                Pressing = "Ger",
+                Rating = "****",
+                Discs = 1,
                 Media = "CD",
                 Bought = DateTime.Now,
-                Cost = 19.99m,
-                Review = "This is James' third album."
+                Cost = 10.99m,
+                CoverName = null,
+                Review = "This is James' fifth album."
+            });
+
+            if (recordId > 0)
+            {
+                _output.WriteLine($"Record updated successfully");
+            }
+            else
+            {
+                _output.WriteError("Failed to update record.");
+            }
+        }
+
+        private async Task AddNewRecord(int artistId, string name, string field, int recorded, string label, string pressing, string rating, int discs, string media, DateTime bought, decimal cost, string coverName, string review)
+        {
+            var recordId = await _repository.AddRecordAsync(new Record
+            {
+                ArtistId = artistId,
+                Name = name,
+                Field = field,
+                Recorded = recorded,
+                Label = label,
+                Pressing = pressing,
+                Rating = rating,
+                Discs = discs,
+                Media = media,
+                Bought = bought,
+                Cost = cost,
+                CoverName = null,
+                Review = review
             });
 
             if (recordId > 0)
