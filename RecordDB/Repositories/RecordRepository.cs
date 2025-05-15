@@ -195,47 +195,85 @@ namespace RecordDB.Repositories
 
          public async Task<int> GetRecordsByYearAsync(int year)
         {
-            throw new NotImplementedException();
+            using var connection = _connectionFactory.CreateConnection();
+            var parameters = new DynamicParameters();
+            parameters.Add("@Year", year);
+            return await connection.ExecuteScalarAsync<int>("up_GetRecordedYearNumber", parameters, commandType: CommandType.StoredProcedure);
         }
 
          public async Task<int> GetTotalNumberOfCDsAsync()
         {
-            throw new NotImplementedException();
+            using var connection = _connectionFactory.CreateConnection();
+            return await connection.ExecuteScalarAsync<int>("adm_GetTotalCDCount", commandType: CommandType.StoredProcedure);
         }
 
          public async Task<int> GetNoReviewCountAsync()
         {
-            throw new NotImplementedException();
+            using var connection = _connectionFactory.CreateConnection();
+            return await connection.ExecuteScalarAsync<int>("up_GetNoRecordReviewCount", commandType: CommandType.StoredProcedure);
         }
 
-         public async Task<int> GetBoughtDiscCountForYear(int year)
+        public async Task<int> GetBoughtDiscCountForYear(int year)
         {
-            throw new NotImplementedException();
+            using var connection = _connectionFactory.CreateConnection();
+            var parameter = new DynamicParameters();
+            parameter.Add("@Year", year);
+            return await connection.ExecuteScalarAsync<int>("up_GetTotalYearNumber", parameter, commandType: CommandType.StoredProcedure);
         }
 
          public async Task<int> GetTotalNumberOfDiscsAsync()
         {
-            throw new NotImplementedException();
+            using var connection = _connectionFactory.CreateConnection();
+            return await connection.ExecuteScalarAsync<int>("up_GetTotalNumberOfAllRecords", commandType: CommandType.StoredProcedure);
         }
 
-         public async Task<Record> GetRecordDetailsAsync(int recordId)
+        public async Task<ArtistRecord> GetRecordDetailsAsync(int recordId)
         {
-            throw new NotImplementedException();
+            using var connection = _connectionFactory.CreateConnection();
+            var parameter = new DynamicParameters();
+            parameter.Add("@RecordId", recordId);
+            var artistRecord = await connection.QueryFirstOrDefaultAsync<ArtistRecord>("up_getSingleArtistAndRecord", parameter, commandType: CommandType.StoredProcedure);
+            return artistRecord;
         }
 
-         public async Task<string> GetArtistNameFromRecordAsync(int recordId)
+        public async Task<string> GetArtistNameFromRecordAsync(int recordId)
         {
-            throw new NotImplementedException();
+            var parameter = new DynamicParameters();
+            parameter.Add("@RecordId", recordId);
+            try
+            {
+                using (var connection = _connectionFactory.CreateConnection())
+                {
+                    var command = new CommandDefinition("up_GetArtistNameByRecordId",  parameter, commandType: CommandType.StoredProcedure);
+                    var name = await connection.ExecuteScalarAsync<string>(command);
+                    return name ?? string.Empty;
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error: {ex.Message}");
+                return string.Empty;
+            }
         }
 
          public async Task<List<Total>> GetTotalArtistCostAsync()
         {
-            throw new NotImplementedException();
+            using var connection = _connectionFactory.CreateConnection();
+            return (await connection.QueryAsync<Total>("sp_getTotalsForEachArtist", commandType: CommandType.StoredProcedure)).ToList(); ;
         }
 
-         public async Task<List<Total>> GetTotalArtistDiscsAsync()
+        public async Task<List<Total>> GetTotalArtistDiscsAsync()
         {
-            throw new NotImplementedException();
+            using var connection = _connectionFactory.CreateConnection();
+            return (await connection.QueryAsync<Total>("sp_getTotalDiscsForEachArtist", commandType: CommandType.StoredProcedure)).ToList(); ;
+        }
+
+        public async Task<IEnumerable<Record>> GetRecordsByNameAsync(string name)
+        {
+            using var connection = _connectionFactory.CreateConnection();
+            var parameter = new DynamicParameters();
+            parameter.Add("@Name", name);
+            return await connection.QueryAsync<Record>("up_GetRecordByName", parameter, commandType: CommandType.StoredProcedure);
         }
     }
 }

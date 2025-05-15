@@ -35,7 +35,127 @@ namespace RecordDB.Services
             // await GetNoRecordReviewsAsync();
             // await CountDiscsAsync("****");
             // await GetArtistNumberOfRecordsAsync(114);
-            await GetRecordByNameAsync("Blonde On Blonde");
+            // await GetRecordByNameAsync("Blonde On");
+            // await GetRecordsByNameAsync("Bringing");
+            // await GetArtistNameFromRecordAsync(3232);
+            // await GetRecordsByYearAsync(1974);
+            // await GetTotalNumberOfCDsAsync();
+            // await GetNoReviewCountAsync();
+            // await GetBoughtDiscCountForYear(2010);
+            // await GetTotalNumberOfDiscsAsync();
+            // await GetRecordDetailsAsync(3232);
+            // await GetTotalArtistCostAsync();
+            await GetTotalArtistDiscsAsync();
+        }
+
+        private async Task GetTotalArtistDiscsAsync()
+        {
+            var totals = await _repository.GetTotalArtistDiscsAsync();
+            foreach (var total in totals)
+            {
+                _output.WriteLine($"ArtistId: {total.ArtistId}, Artist: {total.Name} - Total Discs: {total.TotalDiscs}");
+            }
+        }
+
+        private async Task GetTotalArtistCostAsync()
+        {
+            var totals = await _repository.GetTotalArtistCostAsync();
+            foreach (var total in totals)
+            {
+                _output.WriteLine($"ArtistId: {total.ArtistId}, Artist: {total.Name} - Total Discs: {total.TotalDiscs} - Total Cost: {total.TotalCost}");
+            }
+        }
+
+        private async Task GetRecordDetailsAsync(int recordId)
+        {
+
+            var record = await _repository.GetRecordDetailsAsync(recordId);
+            if (record is not null)
+            {
+                _output.WriteLine($"ArtistId: {record.ArtistId}, Artist: {record.ArtistName} -- Record Id: {record.RecordId}, Name: {record.Name}, Recorded: {record.Recorded}, Media: {record.Media}");
+            }
+            else
+            {
+                _output.WriteError($"Record with ID {recordId} not found.");
+            }
+        }
+
+        private async Task GetTotalNumberOfDiscsAsync()
+        {
+            var total = await _repository.GetTotalNumberOfDiscsAsync();
+            if (total > 0)
+            {
+                _output.WriteLine($"Total number of discs: {total}");
+            }
+            else
+            {
+                _output.WriteError("No discs found.");
+            }
+        }
+
+        private async Task GetBoughtDiscCountForYear(int year)
+        {
+            var count = await _repository.GetBoughtDiscCountForYear(year);
+            if (count > 0)
+            {
+                _output.WriteLine($"Total number of bought discs for year {year}: {count}");
+            }
+            else
+            {
+                _output.WriteError($"No bought discs found for year: {year}");
+            }
+        }
+
+        private async Task GetNoReviewCountAsync()
+        {
+            var count = await _repository.GetNoReviewCountAsync();
+            if (count > 0)
+            {
+                _output.WriteLine($"Total number of records with no reviews: {count}");
+            }
+            else
+            {
+                _output.WriteError("No records found with no reviews.");
+            }
+        }
+
+        private async Task GetTotalNumberOfCDsAsync()
+        {
+            var total = await _repository.GetTotalNumberOfCDsAsync();
+            if (total > 0)
+            {
+                _output.WriteLine($"Total number of CD's: {total}");
+            }
+            else
+            {
+                _output.WriteError("No CD's found.");
+            }
+        }
+
+        private async Task GetRecordsByYearAsync(int year)
+        {
+            var records = await _repository.GetRecordsByYearAsync(year);
+            if (records > 0)
+            {
+                _output.WriteLine($"Total records for year {year}: {records}");
+            }
+            else
+            {
+                _output.WriteError($"No records found for year: {year}");
+            }
+        }
+
+        private async Task GetArtistNameFromRecordAsync(int recordId)
+        {
+            var artistName = await _repository.GetArtistNameFromRecordAsync(recordId);
+            if (!string.IsNullOrEmpty(artistName))
+            {
+                _output.WriteLine($"Artist Name: {artistName}");
+            }
+            else
+            {
+                _output.WriteError($"No artist found for record ID: {recordId}");
+            }
         }
 
         private async Task GetRecordByNameAsync(string name)
@@ -56,6 +176,31 @@ namespace RecordDB.Services
             else
             {
                 _output.WriteError($"Record: {name} not found.");
+            }
+        }
+
+        private async Task GetRecordsByNameAsync(string name)
+        {
+
+            var records = await _repository.GetRecordsByNameAsync(name);
+            if (records is not null)
+            {
+                foreach (var record in records)
+                {
+                    var artistName = await _repository.GetArtistNameFromRecordAsync(record.RecordId);
+                    if (artistName is not null)
+                    {
+                        _output.WriteLine($"Artist: {artistName} - Record: {record.Name} - {record.Recorded}");
+                    }
+                    else
+                    {
+                        _output.WriteError($"No artist found for record: {name}");
+                    }
+                }
+            }
+            else
+            {
+                _output.WriteError($"No records found for name: {name}");
             }
         }
 

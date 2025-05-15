@@ -23,12 +23,13 @@ namespace RecordDB.Repositories
         Task<string> CountDiscsAsync(string show);
         Task<string> GetArtistNumberOfRecordsAsync(int artistId);
         Task<Record> GetRecordByNameAsync(string name);
+        Task<IEnumerable<Record>> GetRecordsByNameAsync(string name);
         Task<int> GetRecordsByYearAsync(int year);
         Task<int> GetTotalNumberOfCDsAsync();
         Task<int> GetNoReviewCountAsync();
         Task<int> GetBoughtDiscCountForYear(int year);
         Task<int> GetTotalNumberOfDiscsAsync();
-        Task<Record> GetRecordDetailsAsync(int recordId);
+        Task<ArtistRecord> GetRecordDetailsAsync(int recordId);
         Task<string> GetArtistNameFromRecordAsync(int recordId);
         Task<List<Total>> GetTotalArtistCostAsync();
         Task<List<Total>> GetTotalArtistDiscsAsync();

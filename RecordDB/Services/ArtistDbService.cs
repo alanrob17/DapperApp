@@ -46,7 +46,7 @@ namespace RecordDB.Services
             // await GetArtistNameFromRecordIdAsync(5249);
             // await ShowArtistAsync(114);
             await GetArtistNameAsync(114);
-            await GetAllArtistsAsync();
+            // await GetAllArtistsAsync();
         }
 
         private async Task GetAllArtistsAsync()
