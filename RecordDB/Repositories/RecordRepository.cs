@@ -275,5 +275,13 @@ namespace RecordDB.Repositories
             parameter.Add("@Name", name);
             return await connection.QueryAsync<Record>("up_GetRecordByName", parameter, commandType: CommandType.StoredProcedure);
         }
+
+        public async Task<List<Record>> GetRecordListByArtistAsync(int artistId)
+        {
+            using var connection = _connectionFactory.CreateConnection();
+            var parameter = new DynamicParameters();
+            parameter.Add("@ArtistId", artistId);
+            return (await connection.QueryAsync<Record>("up_getRecordListandNone", parameter, commandType: CommandType.StoredProcedure)).ToList();
+        }
     }
 }

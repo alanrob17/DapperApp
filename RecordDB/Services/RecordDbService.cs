@@ -45,7 +45,26 @@ namespace RecordDB.Services
             // await GetTotalNumberOfDiscsAsync();
             // await GetRecordDetailsAsync(3232);
             // await GetTotalArtistCostAsync();
-            await GetTotalArtistDiscsAsync();
+            // await GetTotalArtistDiscsAsync();
+            await GetRecordListbyArtistAsync(114);
+        }
+
+        private async Task GetRecordListbyArtistAsync(int artistId)
+        {
+
+            var records = await _repository.GetRecordListByArtistAsync(artistId);
+
+            var recordDictionary = new Dictionary<int, string>();
+
+            foreach (var record in records)
+            {
+                recordDictionary.Add(record.RecordId, record.Name);
+            }
+
+            foreach (var record in recordDictionary)
+            {
+                _output.WriteLine($"Id: {record.Key}, Name: {record.Value}");
+            }
         }
 
         private async Task GetTotalArtistDiscsAsync()
