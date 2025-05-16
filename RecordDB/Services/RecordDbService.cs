@@ -22,10 +22,10 @@ namespace RecordDB.Services
         }
         public async Task RunAllDatabaseOperations()
         {
-            //await GetAllRecordsAsync();
-            //await GetRecordByIdAsync(1076);
-            //await CountTotalRecordsAsync();
-            //await GetRecordsByArtistIdAsync(114);
+            // await GetAllRecordsAsync();
+            // await GetRecordByIdAsync(1076);
+            // await CountTotalRecordsAsync();
+            // await GetRecordsByArtistIdAsync(114);
             // await AddNewRecord();
             // await AddNewRecord(863, "Bass Rebellion", "Rock", 2025, "Wobble Music", "Aus", "***", 1, "CD", DateTime.Now, 19.99m, null, "This is James' second album.");
             // await DeleteRecordAsync(5285);
@@ -46,7 +46,22 @@ namespace RecordDB.Services
             // await GetRecordDetailsAsync(3232);
             // await GetTotalArtistCostAsync();
             // await GetTotalArtistDiscsAsync();
-            await GetRecordListbyArtistAsync(114);
+            // await GetRecordListbyArtistAsync(114);
+            await GetRecordHtmlAsync(3232);
+        }
+
+        private async Task GetRecordHtmlAsync(int recordId)
+        {
+            ArtistRecord record = await _repository.GetRecordHtmlAsync(recordId);
+            if (record is not null)
+            {
+                string recordHtml = RecordHtml(record);
+                _output.WriteLine(recordHtml);
+            }
+            else
+            {
+                _output.WriteError($"Record with ID {recordId} not found.");
+            }
         }
 
         private async Task GetRecordListbyArtistAsync(int artistId)
@@ -428,6 +443,25 @@ namespace RecordDB.Services
             {
                 _output.WriteLine(record.ToString());
             }
+        }
+
+        private string RecordHtml(ArtistRecord record)
+        {
+            var bought = record.Bought.HasValue ? record.Bought.Value.ToString("dd-MM-yyyy") : "unk";
+            var recordHtml = $@"
+                <h1>{record.Name}</h1>
+                <h2>Artist: {record.ArtistName}</h2>
+                <p>Field: {record.Field}</p>
+                <p>Recorded: {record.Recorded}</p>
+                <p>Label: {record.Label}</p>
+                <p>Pressing: {record.Pressing}</p>
+                <p>Rating: {record.Rating}</p>
+                <p>Discs: {record.Discs}</p>
+                <p>Media: {record.Media}</p>
+                <p>Bought: {bought}</p>
+                <p>Cost: {record.Cost:C}</p>
+                <p>Review: {record.Review}</p>";
+            return recordHtml;
         }
     }
 }

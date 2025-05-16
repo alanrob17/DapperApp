@@ -34,6 +34,7 @@ namespace RecordDB.Repositories
         Task<string> GetArtistNameFromRecordAsync(int recordId);
         Task<List<Total>> GetTotalArtistCostAsync();
         Task<List<Total>> GetTotalArtistDiscsAsync();
+        Task<ArtistRecord> GetRecordHtmlAsync(int recordId);
 
     }
 }
