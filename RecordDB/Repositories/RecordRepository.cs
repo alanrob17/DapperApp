@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using Dapper;
@@ -13,10 +14,12 @@ namespace RecordDB.Repositories
     public class RecordRepository : IRecordRepository
     {
         private readonly IDbConnectionFactory _connectionFactory;
+        private readonly IDataAccess _db;
 
-        public RecordRepository(IDbConnectionFactory connectionFactory)
+        public RecordRepository(IDbConnectionFactory connectionFactory, IDataAccess db)
         {
             _connectionFactory = connectionFactory;
+            _db = db;
         }
 
         public async Task<int> AddRecordAsync(Record record)
@@ -49,28 +52,28 @@ namespace RecordDB.Repositories
         public async Task<bool> DeleteRecordAsync(int recordId)
         {
             using var connection = _connectionFactory.CreateConnection();
-            var parameters = new DynamicParameters();
-            parameters.Add("@RecordId", recordId);
-            var rowsAffected = await connection.ExecuteAsync("up_deleteRecord", parameters, commandType: CommandType.StoredProcedure);
+            var parameter = new { RecordId = recordId };
+            var rowsAffected = await connection.ExecuteAsync("up_deleteRecord", parameter, commandType: CommandType.StoredProcedure);
             return rowsAffected > 0;
         }
         
         public async Task<int> CountTotalRecordsAsync()
         {
-            using var connection = _connectionFactory.CreateConnection();
-            return await connection.ExecuteScalarAsync<int>("up_GetTotalNumberOfAllRecords", commandType: CommandType.StoredProcedure);
+            string sproc = "up_GetTotalNumberOfAllRecords";
+            return await _db.GetCountOrIdAsync(sproc, new { });
         }
 
         public async Task<IEnumerable<Record>> GetAllRecordsAsync()
         {
-            using var connection = _connectionFactory.CreateConnection();
-            return await connection.QueryAsync<Record>("up_RecordSelectAll", commandType: CommandType.StoredProcedure);
+            string sproc = "up_RecordSelectAll";
+            return await _db.GetDataAsync<Record>(sproc, new { });
         }
 
         public async Task<Record> GetRecordByIdAsync(int recordId)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            return await connection.QueryFirstOrDefaultAsync<Record>("up_GetRecordById", new { RecordId = recordId }, commandType: CommandType.StoredProcedure);
+            string sproc = "up_GetRecordById";
+            var parameter = new { RecordId = recordId };
+            return await _db.GetSingleAsync<Record>(sproc, parameter);
         }
 
         public async Task<int> UpdateRecordAsync(Record record)
@@ -96,8 +99,10 @@ namespace RecordDB.Repositories
 
         public async Task<IEnumerable<Record>> GetRecordsByArtistIdAsync(int artistId)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            return await connection.QueryAsync<Record>("up_GetRecordsByArtistId",  new { ArtistId = artistId }, commandType: CommandType.StoredProcedure);
+            string sproc = "up_GetRecordsByArtistId";
+            var parameter = new DynamicParameters();
+            parameter.Add("@ArtistId", artistId);
+            return await _db.GetDataAsync<Record>(sproc, parameter);
         }
 
         public async Task<int> AddRecordAsync(int artistId, string name, string field, int recorded, string label, string pressing, string rating, int discs, string media, DateTime bought, decimal cost, string coverName, string review)
@@ -127,22 +132,21 @@ namespace RecordDB.Repositories
             return parameters.Get<int>("@RecordId");
         }
 
-        public async Task<List<Record>> GetArtistRecordsAsync(int artistId)
+        public async Task<IEnumerable<Record>> GetArtistRecordsAsync(int artistId)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            var parameters = new DynamicParameters();
-            parameters.Add("@ArtistId", artistId);
-            return (await connection.QueryAsync<Record>("up_GetRecordsByArtistId", parameters, commandType: CommandType.StoredProcedure)).ToList();
+            string sproc = "up_GetRecordsByArtistId";
+            var parameter = new DynamicParameters();
+            parameter.Add("@ArtistId", artistId);
+            return await _db.GetDataAsync<Record>(sproc, parameter);
         }
 
-         public async Task<List<ArtistRecordReview>> NoRecordReviewsAsync()
+        public async Task<IEnumerable<ArtistRecordReview>> NoRecordReviewsAsync()
         {
-
-            using var connection = _connectionFactory.CreateConnection();
-            return (await connection.QueryAsync<ArtistRecordReview>("up_GetNoRecordReview", commandType: CommandType.StoredProcedure)).ToList();
+            string sproc = "up_GetNoRecordReview";
+            return await _db.GetDataAsync<ArtistRecordReview>(sproc, new { });
         }
 
-         public async Task<int> UpdateRecordAsync(int recordId, string name, string field, int recorded, string label, string pressing, string rating, int discs, string media, DateTime bought, decimal cost, string coverName, string review)
+        public async Task<int> UpdateRecordAsync(int recordId, string name, string field, int recorded, string label, string pressing, string rating, int discs, string media, DateTime bought, decimal cost, string coverName, string review)
         {
             using var connection = _connectionFactory.CreateConnection();
 
@@ -168,129 +172,140 @@ namespace RecordDB.Repositories
 
         public async Task<string> CountDiscsAsync(string show)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            var parameters = new DynamicParameters();
-            parameters.Add("@Show", show);
-            var discs = await connection.ExecuteScalarAsync<int>("up_CountDiscs", parameters, commandType: CommandType.StoredProcedure);
-
+            string sproc = "up_CountDiscs";
+            var parameter = new DynamicParameters();
+            parameter.Add("@Show", show);
+            var discs = await _db.GetCountOrIdAsync(sproc, parameter);
             return discs.ToString();
         }
 
         public async Task<string> GetArtistNumberOfRecordsAsync(int artistId)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            var parameters = new DynamicParameters();
-            parameters.Add("@ArtistId", artistId);
-            var records = await connection.ExecuteScalarAsync<int>("up_GetArtistNumberOfRecords", parameters, commandType: CommandType.StoredProcedure);
+            string sproc = "up_GetArtistNumberOfRecords";
+            var parameter = new DynamicParameters();
+            parameter.Add("@ArtistId", artistId);
+            var records = await _db.GetCountOrIdAsync(sproc, parameter);
             return records.ToString();
         }
 
         public async Task<Record> GetRecordByNameAsync(string name)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            var parameters = new DynamicParameters();
-            parameters.Add("@Name", name);
-            return await connection.QueryFirstOrDefaultAsync<Record>("up_GetRecordByPartialName", parameters, commandType: CommandType.StoredProcedure);
+            var sproc = "up_GetRecordByPartialName";
+            var parameter = new { Name = name };
+            return await _db.GetSingleAsync<Record>(sproc, parameter);
         }
 
-         public async Task<int> GetRecordsByYearAsync(int year)
+         public async Task<int> GetRecordNumberByYearAsync(int year)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            var parameters = new DynamicParameters();
-            parameters.Add("@Year", year);
-            return await connection.ExecuteScalarAsync<int>("up_GetRecordedYearNumber", parameters, commandType: CommandType.StoredProcedure);
+            var sproc = "up_GetRecordedYearNumber";
+            var parameter = new { Year = year };
+            return await _db.GetCountOrIdAsync(sproc, parameter);
         }
 
          public async Task<int> GetTotalNumberOfCDsAsync()
         {
-            using var connection = _connectionFactory.CreateConnection();
-            return await connection.ExecuteScalarAsync<int>("adm_GetTotalCDCount", commandType: CommandType.StoredProcedure);
+            var sproc = "adm_GetTotalCDCount";
+            return await _db.GetCountOrIdAsync(sproc, new { });
         }
 
          public async Task<int> GetNoReviewCountAsync()
         {
-            using var connection = _connectionFactory.CreateConnection();
-            return await connection.ExecuteScalarAsync<int>("up_GetNoRecordReviewCount", commandType: CommandType.StoredProcedure);
+            var sproc = "up_GetNoRecordReviewCount";
+            return await _db.GetCountOrIdAsync(sproc, new { });
         }
 
-        public async Task<int> GetBoughtDiscCountForYear(int year)
+        public async Task<int> GetBoughtDiscCountForYearAsync(int year)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            var parameter = new DynamicParameters();
-            parameter.Add("@Year", year);
-            return await connection.ExecuteScalarAsync<int>("up_GetTotalYearNumber", parameter, commandType: CommandType.StoredProcedure);
+            // Get count from Bought field
+            var sproc = "up_GetTotalYearNumber";
+            var parameter = new { Year = year };
+            return await _db.GetCountOrIdAsync(sproc, parameter);
         }
 
-         public async Task<int> GetTotalNumberOfDiscsAsync()
+        public async Task<int> GetDiscCountForYearAsync(int year)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            return await connection.ExecuteScalarAsync<int>("up_GetTotalNumberOfAllRecords", commandType: CommandType.StoredProcedure);
+            // Get count from Recorded field
+            var sproc = "up_GetNumberOfRecordsForYear";
+            var parameter = new { Year = year };
+            return await _db.GetCountOrIdAsync(sproc, parameter);
+        }
+
+        public async Task<int> GetTotalNumberOfDiscsAsync()
+        {
+            var sproc = "up_GetTotalNumberOfAllRecords";
+            return await _db.GetCountOrIdAsync(sproc, new { });
         }
 
         public async Task<ArtistRecord> GetRecordDetailsAsync(int recordId)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            var parameter = new DynamicParameters();
-            parameter.Add("@RecordId", recordId);
-            var artistRecord = await connection.QueryFirstOrDefaultAsync<ArtistRecord>("up_getSingleArtistAndRecord", parameter, commandType: CommandType.StoredProcedure);
-            return artistRecord;
+            var sproc = "up_getSingleArtistAndRecord";
+            var parameter = new { RecordId = recordId };
+            return await _db.GetSingleAsync<ArtistRecord>(sproc, parameter);
         }
 
         public async Task<string> GetArtistNameFromRecordAsync(int recordId)
         {
-            var parameter = new DynamicParameters();
-            parameter.Add("@RecordId", recordId);
-            try
-            {
-                using (var connection = _connectionFactory.CreateConnection())
-                {
-                    var command = new CommandDefinition("up_GetArtistNameByRecordId",  parameter, commandType: CommandType.StoredProcedure);
-                    var name = await connection.ExecuteScalarAsync<string>(command);
-                    return name ?? string.Empty;
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error: {ex.Message}");
-                return string.Empty;
-            }
+            var sproc = "up_GetArtistNameByRecordId";
+            var parameter = new { RecordId = recordId };
+            var name = await _db.GetTextAsync(sproc, parameter);
+            return name ?? string.Empty;
         }
 
-         public async Task<List<Total>> GetTotalArtistCostAsync()
+        public async Task<IEnumerable<Total>> GetTotalArtistCostAsync()
         {
-            using var connection = _connectionFactory.CreateConnection();
-            return (await connection.QueryAsync<Total>("sp_getTotalsForEachArtist", commandType: CommandType.StoredProcedure)).ToList(); ;
+            var sproc = "sp_getTotalsForEachArtist";
+            return await _db.GetDataAsync<Total>(sproc, new { });
         }
 
-        public async Task<List<Total>> GetTotalArtistDiscsAsync()
+        public async Task<IEnumerable<Total>> GetTotalArtistDiscsAsync()
         {
-            using var connection = _connectionFactory.CreateConnection();
-            return (await connection.QueryAsync<Total>("sp_getTotalDiscsForEachArtist", commandType: CommandType.StoredProcedure)).ToList(); ;
+            var sproc = "sp_getTotalDiscsForEachArtist";
+            return await _db.GetDataAsync<Total>(sproc, new { });
         }
 
         public async Task<IEnumerable<Record>> GetRecordsByNameAsync(string name)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            var parameter = new DynamicParameters();
-            parameter.Add("@Name", name);
-            return await connection.QueryAsync<Record>("up_GetRecordByName", parameter, commandType: CommandType.StoredProcedure);
+            var sproc = "up_GetRecordByName";
+            var parameter = new { Name = name };
+            return await _db.GetDataAsync<Record>(sproc, parameter);
         }
 
-        public async Task<List<Record>> GetRecordListByArtistAsync(int artistId)
+        public async Task<IEnumerable<Record>> GetRecordListByArtistAsync(int artistId)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            var parameter = new DynamicParameters();
-            parameter.Add("@ArtistId", artistId);
-            return (await connection.QueryAsync<Record>("up_getRecordListandNone", parameter, commandType: CommandType.StoredProcedure)).ToList();
+            string sproc = "up_getRecordListandNone";
+            var parameter = new { ArtistId = artistId };
+            return await _db.GetDataAsync<Record>(sproc, parameter);
         }
 
         public async Task<ArtistRecord> GetRecordHtmlAsync(int recordId)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            var parameter = new DynamicParameters();
-            parameter.Add("@RecordId", recordId);
-            var record = await connection.QueryFirstOrDefaultAsync<ArtistRecord>("up_getSingleArtistAndRecord", parameter, commandType: CommandType.StoredProcedure);
-            return record;
+            var sproc = "up_getSingleArtistAndRecord";
+            var parameter = new { RecordId = recordId };
+            return await _db.GetSingleAsync<ArtistRecord>(sproc, parameter);
+        }
+
+        public async Task<IEnumerable<ArtistRecord>> GetArtistRecordListAsync()
+        {
+            var sproc = "up_GetAllArtistsAndRecords";
+            return await _db.GetDataAsync<ArtistRecord>(sproc, new { });
+        }
+
+        public async Task<int> GetTotalNumberOfRecordsAsync()
+        {
+            string sproc = "up_GetTotalNumberOfRecords";
+            return await _db.GetCountOrIdAsync(sproc, new { });
+        }
+
+        public async Task<int> GetTotalNumberOfBluraysAsync()
+        {
+            string sproc = "up_GetTotalNumberOfAllBlurays";
+            return await _db.GetCountOrIdAsync(sproc, new { });
+        }
+
+        public async Task<int> GetTotalNumberOfDVDsAsync()
+        {
+            string sproc = "up_GetTotalNumberOfAllDVDs";
+            return await _db.GetCountOrIdAsync(sproc, new { });
         }
     }
 }

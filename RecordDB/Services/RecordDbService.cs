@@ -33,21 +33,74 @@ namespace RecordDB.Services
             // await UpdateRecordAsync(5288, "Rockin' The Bass Again", "Rock", 2023, "Wibble Wobble Music", "Aus", "***", 1, "CD", DateTime.Now, 19.99m, null, "This is James' ninth album.");
             // await GetArtistRecordsAsync(114);
             // await GetNoRecordReviewsAsync();
-            // await CountDiscsAsync("****");
+            // await CountDiscsAsync("All");
             // await GetArtistNumberOfRecordsAsync(114);
-            // await GetRecordByNameAsync("Blonde On");
+            // await GetRecordByNameAsync("Doggo");
             // await GetRecordsByNameAsync("Bringing");
-            // await GetArtistNameFromRecordAsync(3232);
-            // await GetRecordsByYearAsync(1974);
+            await GetArtistNameFromRecordAsync(3232);
+            // await GetRecordNumberByYearAsync(1974);
             // await GetTotalNumberOfCDsAsync();
             // await GetNoReviewCountAsync();
-            // await GetBoughtDiscCountForYear(2010);
+            // await GetBoughtDiscCountForYearAsync(2022);
             // await GetTotalNumberOfDiscsAsync();
             // await GetRecordDetailsAsync(3232);
             // await GetTotalArtistCostAsync();
             // await GetTotalArtistDiscsAsync();
             // await GetRecordListbyArtistAsync(114);
-            await GetRecordHtmlAsync(3232);
+            // await GetRecordHtmlAsync(3232);
+            // await GetDiscCountForYearAsync(1974);
+            // await GetArtistRecordListAsync();
+            // await GetTotalNumberOfRecordsAsync();
+            // await GetTotalNumberOfBluraysAsync();
+            // await GetTotalNumberOfDVDsAsync();
+        }
+
+        private async Task GetTotalNumberOfDVDsAsync()
+        {
+            var total = await _repository.GetTotalNumberOfDVDsAsync();
+            if (total > 0)
+            {
+                _output.WriteLine($"Total number of DVDs: {total}");
+            }
+            else
+            {
+                _output.WriteError("No DVDs found.");
+            }
+        }
+
+        private async Task GetTotalNumberOfBluraysAsync()
+        {
+            var total = await _repository.GetTotalNumberOfBluraysAsync();
+            if (total > 0)
+            {
+                _output.WriteLine($"Total number of Blurays: {total}");
+            }
+            else
+            {
+                _output.WriteError("No Blurays found.");
+            }
+        }
+
+        private async Task GetTotalNumberOfRecordsAsync()
+        {
+            var total = await _repository.GetTotalNumberOfRecordsAsync();
+            if (total > 0)
+            {
+                _output.WriteLine($"Total number of records: {total}");
+            }
+            else
+            {
+                _output.WriteError("No records found.");
+            }
+        }
+
+        private async Task GetArtistRecordListAsync()
+        {
+            var records = await _repository.GetArtistRecordListAsync();
+            foreach (var record in records)
+            {
+                _output.WriteLine($"ArtistId: {record.ArtistId}, Artist: {record.ArtistName} - Record Id: {record.RecordId}, Name: {record.Name}, Recorded: {record.Recorded}, Media: {record.Media}");
+            }
         }
 
         private async Task GetRecordHtmlAsync(int recordId)
@@ -127,9 +180,9 @@ namespace RecordDB.Services
             }
         }
 
-        private async Task GetBoughtDiscCountForYear(int year)
+        private async Task GetBoughtDiscCountForYearAsync(int year)
         {
-            var count = await _repository.GetBoughtDiscCountForYear(year);
+            var count = await _repository.GetBoughtDiscCountForYearAsync(year);
             if (count > 0)
             {
                 _output.WriteLine($"Total number of bought discs for year {year}: {count}");
@@ -137,6 +190,19 @@ namespace RecordDB.Services
             else
             {
                 _output.WriteError($"No bought discs found for year: {year}");
+            }
+        }
+
+        private async Task GetDiscCountForYearAsync(int year)
+        {
+            var count = await _repository.GetDiscCountForYearAsync(year);
+            if (count > 0)
+            {
+                _output.WriteLine($"Total number of discs for year {year}: {count}");
+            }
+            else
+            {
+                _output.WriteError($"No discs found for year: {year}");
             }
         }
 
@@ -166,9 +232,9 @@ namespace RecordDB.Services
             }
         }
 
-        private async Task GetRecordsByYearAsync(int year)
+        private async Task GetRecordNumberByYearAsync(int year)
         {
-            var records = await _repository.GetRecordsByYearAsync(year);
+            var records = await _repository.GetRecordNumberByYearAsync(year);
             if (records > 0)
             {
                 _output.WriteLine($"Total records for year {year}: {records}");
@@ -253,7 +319,6 @@ namespace RecordDB.Services
 
         private async Task CountDiscsAsync(string show)
         {
-
             var discs = await _repository.CountDiscsAsync(show);
             _output.WriteLine($"{show}: Total Discs: {discs}");
         }

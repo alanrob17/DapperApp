@@ -17,24 +17,28 @@ namespace RecordDB.Repositories
         Task<bool> DeleteRecordAsync(int recordId);
         Task<int> CountTotalRecordsAsync();
         Task<IEnumerable<Record>> GetRecordsByArtistIdAsync(int artistId);
-        Task<List<Record>> GetArtistRecordsAsync(int artistId);
-        Task<List<ArtistRecordReview>> NoRecordReviewsAsync();
+        Task<IEnumerable<Record>> GetArtistRecordsAsync(int artistId);
+        Task<IEnumerable<ArtistRecordReview>> NoRecordReviewsAsync();
         Task<int> UpdateRecordAsync(int recordId, string name, string field, int recorded, string label, string pressing, string rating, int discs, string media, DateTime bought, decimal cost, string coverName, string review);
         Task<string> CountDiscsAsync(string show);
         Task<string> GetArtistNumberOfRecordsAsync(int artistId);
         Task<Record> GetRecordByNameAsync(string name);
-        Task<List<Record>> GetRecordListByArtistAsync(int artistId);
+        Task<IEnumerable<Record>> GetRecordListByArtistAsync(int artistId);
         Task<IEnumerable<Record>> GetRecordsByNameAsync(string name);
-        Task<int> GetRecordsByYearAsync(int year);
+        Task<int> GetRecordNumberByYearAsync(int year);
         Task<int> GetTotalNumberOfCDsAsync();
         Task<int> GetNoReviewCountAsync();
-        Task<int> GetBoughtDiscCountForYear(int year);
+        Task<int> GetBoughtDiscCountForYearAsync(int year);
+        Task<int> GetDiscCountForYearAsync(int year);
         Task<int> GetTotalNumberOfDiscsAsync();
         Task<ArtistRecord> GetRecordDetailsAsync(int recordId);
         Task<string> GetArtistNameFromRecordAsync(int recordId);
-        Task<List<Total>> GetTotalArtistCostAsync();
-        Task<List<Total>> GetTotalArtistDiscsAsync();
+        Task<IEnumerable<Total>> GetTotalArtistCostAsync();
+        Task<IEnumerable<Total>> GetTotalArtistDiscsAsync();
         Task<ArtistRecord> GetRecordHtmlAsync(int recordId);
-
+        Task<IEnumerable<ArtistRecord>> GetArtistRecordListAsync();
+        Task<int> GetTotalNumberOfRecordsAsync();
+        Task<int> GetTotalNumberOfDVDsAsync();
+        Task<int> GetTotalNumberOfBluraysAsync();
     }
 }

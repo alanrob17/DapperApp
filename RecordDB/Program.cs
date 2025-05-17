@@ -9,6 +9,8 @@ using RecordDB.Services;
 using RecordDB.Data.Interfaces;
 using RecordDB.Data;
 using RecordDB.Services.Output;
+using Microsoft.Extensions.Logging;
+using Serilog;
 
 namespace RecordDB
 {
@@ -16,6 +18,11 @@ namespace RecordDB
     {
         public static async Task Main(string[] args)
         {
+            Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Debug()
+            .WriteTo.Console()
+            .CreateLogger();
+
             var host = Host.CreateDefaultBuilder(args)
                 .ConfigureAppConfiguration((hostingContext, config) =>
                 {
@@ -29,6 +36,8 @@ namespace RecordDB
                     services.AddScoped<IDbConnection>(sp =>
                         sp.GetRequiredService<IDbConnectionFactory>().CreateConnection());
 
+                    services.AddScoped<IDataAccess, DataAccess>();
+                    
                     services.AddScoped<IArtistRepository, ArtistRepository>();
                     services.AddScoped<ArtistDbService>();
                     services.AddScoped<IRecordRepository, RecordRepository>();
@@ -38,6 +47,7 @@ namespace RecordDB
                     services.AddScoped<ArtistDbService>();
 
                 })
+                .UseSerilog()
                 .Build();
 
             //var artistDbService = host.Services.GetRequiredService<ArtistDbService>();
