@@ -65,6 +65,30 @@ namespace RecordDB.Data
             return result ?? throw new KeyNotFoundException($"{typeof(T).Name} record not found");
         }
 
+        public async Task<int> SaveDataAsync<T>(string storedProcedureName, T entity, string outputParameterName = "Id", DbType outputDbType = DbType.Int32)
+        {
+            using var connection = _connectionFactory.CreateConnection();
+            var parameters = new DynamicParameters();
+
+            // Get only non-virtual, non-navigation properties
+            var properties = typeof(T).GetProperties()
+                .Where(p => !p.GetGetMethod()?.IsVirtual == true && !p.PropertyType.IsClass || p.PropertyType == typeof(string));
+
+            foreach (var prop in properties)
+            {
+                // Handle null values appropriately
+                var value = prop.GetValue(entity);
+                parameters.Add($"@{prop.Name}", value ?? (object)DBNull.Value);
+            }
+
+            // Add output parameter
+            parameters.Add($"@{outputParameterName}", dbType: outputDbType, direction: ParameterDirection.Output);
+
+            await connection.ExecuteAsync(storedProcedureName,  parameters, commandType: CommandType.StoredProcedure);
+
+            return parameters.Get<int>($"@{outputParameterName}");
+        }
+
         public async Task<int> GetCountOrIdAsync(string storedProcedureName, object parameters = null)
         {
             using var connection = _connectionFactory.CreateConnection();
@@ -89,6 +113,26 @@ namespace RecordDB.Data
             {
                 _logger.LogError(ex, "Error executing text query {StoredProcedure}", storedProcedureName);
                 return string.Empty;
+            }
+        }
+
+        public async Task<int> DeleteDataAsync(string storedProcedureName, object parameter)
+        {
+            using var connection = _connectionFactory.CreateConnection();
+
+            try
+            {
+                _logger.LogInformation("Executing delete procedure: {Procedure} for ID: {parameter}", storedProcedureName, parameter);
+
+                int rowsAffected = await connection.ExecuteAsync(storedProcedureName, parameter, commandType: CommandType.StoredProcedure);
+
+                _logger.LogDebug("Delete operation affected {RowsAffected} rows", rowsAffected);
+                return rowsAffected;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error deleting record using parameter: {parameter} and procedure {Procedure}", parameter, storedProcedureName);
+                throw;
             }
         }
     }

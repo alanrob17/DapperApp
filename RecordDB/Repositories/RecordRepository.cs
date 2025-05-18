@@ -24,36 +24,14 @@ namespace RecordDB.Repositories
 
         public async Task<int> AddRecordAsync(Record record)
         {
-            using var connection = _connectionFactory.CreateConnection();
-
-            var parameters = new DynamicParameters();
-
-            parameters.Add("@ArtistId", record.ArtistId);
-            parameters.Add("@Name", record.Name);
-            parameters.Add("@Field", record.Field);
-            parameters.Add("@Recorded", record.Recorded);
-            parameters.Add("@Label", record.Label);
-            parameters.Add("@Pressing", record.Pressing);
-            parameters.Add("@Rating", record.Rating);
-            parameters.Add("@Discs", record.Discs);
-            parameters.Add("@Media", record.Media);
-            parameters.Add("@Bought", record.Bought);
-            parameters.Add("@Cost", record.Cost);
-            parameters.Add("@CoverName", null);
-            parameters.Add("@Review", record.Review);
-            parameters.Add("@RecordId", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            await connection.ExecuteAsync("adm_RecordInsert", parameters, commandType: CommandType.StoredProcedure);
-
-            // ExecuteAsync() returns the rows affected. I want the output parameter value
-            return parameters.Get<int>("@RecordId");
+            return await _db.SaveDataAsync("adm_RecordInsert", record, outputParameterName: "RecordId");
         }
         
         public async Task<bool> DeleteRecordAsync(int recordId)
         {
-            using var connection = _connectionFactory.CreateConnection();
+            var sproc = "up_DeleteRecord";
             var parameter = new { RecordId = recordId };
-            var rowsAffected = await connection.ExecuteAsync("up_deleteRecord", parameter, commandType: CommandType.StoredProcedure);
+            var rowsAffected = await _db.DeleteDataAsync("up_deleteRecord", parameter);
             return rowsAffected > 0;
         }
         
@@ -78,23 +56,24 @@ namespace RecordDB.Repositories
 
         public async Task<int> UpdateRecordAsync(Record record)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            var parameters = new DynamicParameters();
-            parameters.Add("@RecordId", record.RecordId);
-            parameters.Add("@Name", record.Name);
-            parameters.Add("@Field", record.Field);
-            parameters.Add("@Recorded", record.Recorded);
-            parameters.Add("@Label", record.Label);
-            parameters.Add("@Pressing", record.Pressing);
-            parameters.Add("@Rating", record.Rating);
-            parameters.Add("@Discs", record.Discs);
-            parameters.Add("@Media", record.Media);
-            parameters.Add("@Bought", record.Bought);
-            parameters.Add("@Cost", record.Cost);
-            parameters.Add("@CoverName", null);
-            parameters.Add("@Review", record.Review);
-            var recordId = await connection.ExecuteAsync("adm_UpdateRecord", parameters, commandType: CommandType.StoredProcedure);
-            return parameters.Get<int>("@RecordId");
+            return await _db.SaveDataAsync("adm_UpdateRecord", record, outputParameterName: "RowsAffected");
+            //using var connection = _connectionFactory.CreateConnection();
+            //var parameters = new DynamicParameters();
+            //parameters.Add("@RecordId", record.RecordId);
+            //parameters.Add("@Name", record.Name);
+            //parameters.Add("@Field", record.Field);
+            //parameters.Add("@Recorded", record.Recorded);
+            //parameters.Add("@Label", record.Label);
+            //parameters.Add("@Pressing", record.Pressing);
+            //parameters.Add("@Rating", record.Rating);
+            //parameters.Add("@Discs", record.Discs);
+            //parameters.Add("@Media", record.Media);
+            //parameters.Add("@Bought", record.Bought);
+            //parameters.Add("@Cost", record.Cost);
+            //parameters.Add("@CoverName", null);
+            //parameters.Add("@Review", record.Review);
+            //var recordId = await connection.ExecuteAsync("adm_UpdateRecord", parameters, commandType: CommandType.StoredProcedure);
+            //return parameters.Get<int>("@RecordId");
         }
 
         public async Task<IEnumerable<Record>> GetRecordsByArtistIdAsync(int artistId)
@@ -107,29 +86,24 @@ namespace RecordDB.Repositories
 
         public async Task<int> AddRecordAsync(int artistId, string name, string field, int recorded, string label, string pressing, string rating, int discs, string media, DateTime bought, decimal cost, string coverName, string review)
         {
-            using var connection = _connectionFactory.CreateConnection();
+            var record = new Record
+            {
+                ArtistId = artistId,
+                Name = name,
+                Field = field,
+                Recorded = recorded,
+                Label = label,
+                Pressing = pressing,
+                Rating = rating,
+                Discs = discs,
+                Media = media,
+                Bought = bought,
+                Cost = cost,
+                CoverName = coverName,
+                Review = review
+            };
 
-            var parameters = new DynamicParameters();
-
-            parameters.Add("@ArtistId", artistId);
-            parameters.Add("@Name", name);
-            parameters.Add("@Field", field);
-            parameters.Add("@Recorded", recorded);
-            parameters.Add("@Label", label);
-            parameters.Add("@Pressing", pressing);
-            parameters.Add("@Rating", rating);
-            parameters.Add("@Discs", discs);
-            parameters.Add("@Media", media);
-            parameters.Add("@Bought", bought);
-            parameters.Add("@Cost", cost);
-            parameters.Add("@CoverName", null);
-            parameters.Add("@Review", review);
-            parameters.Add("@RecordId", dbType: DbType.Int32, direction: ParameterDirection.Output);
-
-            await connection.ExecuteAsync("adm_RecordInsert", parameters, commandType: CommandType.StoredProcedure);
-
-            // ExecuteAsync() returns the rows affected. I want the output parameter value
-            return parameters.Get<int>("@RecordId");
+            return await _db.SaveDataAsync("adm_RecordInsert", record, outputParameterName: "RecordId");
         }
 
         public async Task<IEnumerable<Record>> GetArtistRecordsAsync(int artistId)
@@ -148,11 +122,12 @@ namespace RecordDB.Repositories
 
         public async Task<int> UpdateRecordAsync(int recordId, string name, string field, int recorded, string label, string pressing, string rating, int discs, string media, DateTime bought, decimal cost, string coverName, string review)
         {
-            using var connection = _connectionFactory.CreateConnection();
+            //using var connection = _connectionFactory.CreateConnection();
 
             var record = new Record
             {
                 RecordId = recordId,
+                ArtistId = 0,
                 Name = name,
                 Field = field,
                 Recorded = recorded,
@@ -166,8 +141,9 @@ namespace RecordDB.Repositories
                 CoverName = coverName,
                 Review = review
             };
-            var result = await connection.ExecuteAsync("adm_UpdateRecord", new { Record = record}, commandType: CommandType.StoredProcedure);
-            return result;
+
+            return await _db.SaveDataAsync("adm_UpdateRecord", record, outputParameterName: "RowsAffected");
+            // return await connection.ExecuteAsync("adm_UpdateRecord", new { Record = record}, commandType: CommandType.StoredProcedure);
         }
 
         public async Task<string> CountDiscsAsync(string show)

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -15,6 +16,8 @@ namespace RecordDB.Data.Interfaces
         Task<T?> GetSingleAsync<T>(string storedProcedureName, object parameters) where T : class;
         Task<T> GetSingleEntityAsync<T>(string storedProcedureName, object parameters) where T : class;
         Task<string> GetTextAsync(string storedProcedureName, object parameters = null);
+        Task<int> SaveDataAsync<T>(string storedProcedureName, T entity, string outputParameterName = "Id", DbType outputDbType = DbType.Int32);
+        Task<int> DeleteDataAsync(string storedProcedureName, object parameter);
         //Task<IEnumerable<T>> GetAllAsync<T>(string sql, object? parameters = null);
         //Task<T> GetSingleAsync<T>(string sql, object? parameters = null);
         //Task<int> ExecuteAsync(string sql, object? parameters = null);

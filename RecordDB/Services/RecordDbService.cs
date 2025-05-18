@@ -22,22 +22,22 @@ namespace RecordDB.Services
         }
         public async Task RunAllDatabaseOperations()
         {
-            // await GetAllRecordsAsync();
+            await GetAllRecordsAsync();
             // await GetRecordByIdAsync(1076);
             // await CountTotalRecordsAsync();
             // await GetRecordsByArtistIdAsync(114);
             // await AddNewRecord();
-            // await AddNewRecord(863, "Bass Rebellion", "Rock", 2025, "Wobble Music", "Aus", "***", 1, "CD", DateTime.Now, 19.99m, null, "This is James' second album.");
-            // await DeleteRecordAsync(5285);
+            // await AddNewRecord(861, "Hip-Hop Rebellion", "Rock", 2025, "Wobble Dobble Music", "Aus", "***", 1, "CD", DateTime.Now, 19.99m, "", "This is Charlie's second album.");
+            // await DeleteRecordAsync(5292);
             // await UpdateRecordAsync();
-            // await UpdateRecordAsync(5288, "Rockin' The Bass Again", "Rock", 2023, "Wibble Wobble Music", "Aus", "***", 1, "CD", DateTime.Now, 19.99m, null, "This is James' ninth album.");
+            // await UpdateRecordAsync(5291, "Rockin' The Boogie Bass Again", "Rock", 2023, "Wibble Wobble Music", "Aus", "***", 1, "CD", DateTime.Now, 19.99m, "", "This is Charlies's second album.");
             // await GetArtistRecordsAsync(114);
             // await GetNoRecordReviewsAsync();
             // await CountDiscsAsync("All");
             // await GetArtistNumberOfRecordsAsync(114);
             // await GetRecordByNameAsync("Doggo");
             // await GetRecordsByNameAsync("Bringing");
-            await GetArtistNameFromRecordAsync(3232);
+            // await GetArtistNameFromRecordAsync(3232);
             // await GetRecordNumberByYearAsync(1974);
             // await GetTotalNumberOfCDsAsync();
             // await GetNoReviewCountAsync();
@@ -347,6 +347,7 @@ namespace RecordDB.Services
             var record = new Record
             {
                 RecordId = recordId,
+                ArtistId = 0,
                 Name = name,
                 Field = field,
                 Recorded = recorded,
@@ -360,8 +361,9 @@ namespace RecordDB.Services
                 CoverName = coverName,
                 Review = review
             };
-            recordId = await _repository.UpdateRecordAsync(record);
-            if (recordId > 0)
+            
+            var rowsAffected = await _repository.UpdateRecordAsync(record);
+            if (rowsAffected > 0)
             {
                 _output.WriteLine($"Record Id: {recordId} updated successfully.");
             }
@@ -375,22 +377,23 @@ namespace RecordDB.Services
         {
             var record = new Record
             {
-                RecordId = 5288,
-                Name = "Rockin' Bass Rebellion",
+                RecordId = 5292,
+                ArtistId = 0,
+                Name = "Rockin' Bass Guitar Rebellion",
                 Field = "Rock",
                 Recorded = 2023,
                 Label = "Wobble Music",
                 Pressing = "Aus",
                 Rating = "***",
-                Discs = 3,
+                Discs = 1,
                 Media = "CD",
                 Bought = DateTime.Now,
-                Cost = 29.99m,
-                CoverName = null,
+                Cost = 19.99m,
+                CoverName = "",
                 Review = "This is James' sixth album."
             };
-            var recordId = await _repository.UpdateRecordAsync(record);
-            if (recordId > 0)
+            var rowsAffected = await _repository.UpdateRecordAsync(record);
+            if (rowsAffected > 0)
             {
                 _output.WriteLine($"Record with ID {record.RecordId} updated successfully.");
             }
@@ -417,11 +420,10 @@ namespace RecordDB.Services
         {
             var recordId = await _repository.AddRecordAsync(new Record
             {
-                RecordId = 5288,
-                ArtistId = 863,
-                Name = "Rockin' and Rollin' Bass",
-                Field = "Rock",
-                Recorded = 2020,
+                ArtistId = 861,
+                Name = "Hip Hop Extroadinaire!",
+                Field = "Jazz",
+                Recorded = 2024,
                 Label = "Wobble Dobble Music",
                 Pressing = "Ger",
                 Rating = "****",
@@ -429,17 +431,17 @@ namespace RecordDB.Services
                 Media = "CD",
                 Bought = DateTime.Now,
                 Cost = 10.99m,
-                CoverName = null,
-                Review = "This is James' fifth album."
+                CoverName = "",
+                Review = "This is Charlie's first album."
             });
 
             if (recordId > 0)
             {
-                _output.WriteLine($"Record updated successfully");
+                _output.WriteLine($"Record with Id: {recordId} added successfully");
             }
             else
             {
-                _output.WriteError("Failed to update record.");
+                _output.WriteError("Failed to add record!");
             }
         }
 
@@ -458,13 +460,13 @@ namespace RecordDB.Services
                 Media = media,
                 Bought = bought,
                 Cost = cost,
-                CoverName = null,
+                CoverName = "",
                 Review = review
             });
 
             if (recordId > 0)
             {
-                _output.WriteLine($"Record added successfully with ArtistId: {recordId}");
+                _output.WriteLine($"Record added successfully with RecordId: {recordId}");
             }
             else
             {
