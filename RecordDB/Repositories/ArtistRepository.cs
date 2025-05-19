@@ -17,10 +17,12 @@ namespace RecordDB.Repositories
     public class ArtistRepository : IArtistRepository
     {
         private readonly IDbConnectionFactory _connectionFactory;
+        private readonly IDataAccess _db;
 
-        public ArtistRepository(IDbConnectionFactory connectionFactory)
+        public ArtistRepository(IDbConnectionFactory connectionFactory, IDataAccess db)
         {
             _connectionFactory = connectionFactory;
+            _db = db;
         }
 
         public async Task<bool> AddArtistAsync(Artist artist)
@@ -56,19 +58,15 @@ namespace RecordDB.Repositories
 
         public async Task<bool> CheckForArtistNameAsync(string name)
         {
-            using var connection = _connectionFactory.CreateConnection();
-
             string sproc = "up_CheckArtistExists";
-            var parameter = new DynamicParameters();
-            parameter.Add("@Name", name);
-
-            return await connection.ExecuteScalarAsync<bool>(sproc, parameter, commandType: CommandType.StoredProcedure);
+            var parameter = new { Name = name };
+            return await _db.GetCountOrIdAsync(sproc, parameter) > 0;
         }
 
         public async Task<int> CountArtistsAsync()
         {
-            using var connection = _connectionFactory.CreateConnection();
-            return await connection.ExecuteScalarAsync<int>("up_GetArtistCount", commandType: CommandType.StoredProcedure);
+            var sproc = "up_GetArtistCount";
+            return await _db.GetCountOrIdAsync(sproc, new { });
         }
 
         public async Task<bool> DeleteArtistAsync(int artistId)
@@ -87,54 +85,42 @@ namespace RecordDB.Repositories
 
         public async Task<Artist?> GetArtistByFirstLastNameAsync(string firstName, string lastName)
         {
-            using var connection = _connectionFactory.CreateConnection();
-
             string sproc = "up_ArtistByFirstLastName";
             var parameters = new DynamicParameters();
             parameters.Add("@FirstName", firstName);
             parameters.Add("@LastName", lastName);
-
-            IEnumerable<Artist> artist = await connection.QueryAsync<Artist>(sproc, parameters, commandType: CommandType.StoredProcedure);
-            return artist?.FirstOrDefault() ?? null;
+            return await _db.GetSingleAsync<Artist>(sproc, parameters);
         }
 
         public async Task<Artist>? GetArtistByIdAsync(int artistId)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            return await connection.QueryFirstOrDefaultAsync<Artist>("up_ArtistSelectById", new { ArtistId = artistId }, commandType: CommandType.StoredProcedure);
+            var sproc = "up_ArtistSelectById";
+            var parameter = new { ArtistId = artistId };
+            return await _db.GetSingleAsync<Artist>(sproc, parameter);
         }
 
         public async Task<Artist?> GetArtistByNameAsync(string name)
         {
-            using var connection = _connectionFactory.CreateConnection();
-
             string sproc = "up_GetFullArtistByName";
-            IEnumerable<Artist> artist = await connection.QueryAsync<Artist>(sproc, new { Name = name }, commandType: CommandType.StoredProcedure);
-            return artist?.FirstOrDefault() ?? null;
+            var parameter = new { Name = name };
+            return await _db.GetSingleAsync<Artist>(sproc, parameter);
         }
 
         public async Task<int> GetArtistIdAsync(string firstName, string lastName)
         {
-            using var connection = _connectionFactory.CreateConnection();
-
             var sproc = "up_getArtistIdByName";
             var parameters = new DynamicParameters();
             parameters.Add("@FirstName", firstName);
             parameters.Add("@LastName", lastName);
             parameters.Add("@ArtistId", 0, DbType.Int32, ParameterDirection.Output);
-
-            return await connection.ExecuteScalarAsync<int>(sproc, parameters, commandType: CommandType.StoredProcedure);
+            return await _db.GetCountOrIdAsync(sproc, parameters);
         }
 
         public async Task<int> GetArtistIdFromRecordAsync(int recordId)
         {
-            using var connection = _connectionFactory.CreateConnection();
-
             var sproc = "up_getArtistIdFromRecordId";
-            var parameters = new DynamicParameters();
-            parameters.Add("@RecordId", recordId);
-
-            return await connection.ExecuteScalarAsync<int>(sproc, parameters, commandType: CommandType.StoredProcedure);
+            var parameter = new { RecordId = recordId };
+            return await _db.GetCountOrIdAsync(sproc, parameter);
         }
 
         public async Task<IEnumerable<Artist>> GetArtistListAsync()
@@ -145,27 +131,20 @@ namespace RecordDB.Repositories
 
         public async Task<string> GetArtistNameAsync(int artistId)
         {
-
-            using var connection = _connectionFactory.CreateConnection();
             var sproc = "up_GetArtistNameByArtistId";
-            var parameters = new DynamicParameters();
-            parameters.Add("@ArtistId", artistId);
-            var name = await connection.ExecuteScalarAsync<string>(sproc, parameters, commandType: CommandType.StoredProcedure);
+            var parameters = new { ArtistId = artistId};
+            var name = await _db.GetTextAsync(sproc, parameters);
 
             return name ?? string.Empty;
         }
 
         public async Task<string> GetArtistNameByRecordIdAsync(int recordId)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            
             var sproc = "up_GetArtistNameByRecordId";
-            var parameter = new DynamicParameters();
-            parameter.Add("@RecordId", recordId);
+            var parameter = new { RecordId = recordId };           
+            Artist artist = await _db.GetSingleAsync<Artist>(sproc, parameter);
 
-            IEnumerable<Artist> artist = await connection.QueryAsync<Artist>(sproc, parameter, commandType: CommandType.StoredProcedure);
-
-            return artist?.FirstOrDefault()?.Name ?? string.Empty;
+            return artist?.Name ?? string.Empty;
         }
 
         public async Task<IEnumerable<Artist>> GetArtistsWithNoBioAsync()
@@ -183,43 +162,29 @@ namespace RecordDB.Repositories
 
         public async Task<Artist?> GetBiographyAsync(int artistId)
         {
-            using var connection = _connectionFactory.CreateConnection();
-
             var sproc = "up_ArtistSelectById";
-            var parameters = new DynamicParameters();
-            parameters.Add("@ArtistId", artistId);
-            return await connection.QueryFirstOrDefaultAsync<Artist>(sproc, parameters, commandType: CommandType.StoredProcedure);
+            var parameters = new { ArtistId = artistId };
+            return await _db.GetSingleAsync<Artist>(sproc, parameters);
         }
 
         public async Task<string> GetBiographyFromRecordIdAsync(int recordId)
         {
-            using var connection = _connectionFactory.CreateConnection();
-            
             var sproc = "up_GetBiography";
-            var parameter = new DynamicParameters();
-            parameter.Add("@RecordId", recordId);
-
-            return await connection.ExecuteScalarAsync<string>(sproc, parameter, commandType: CommandType.StoredProcedure);
+            var parameter = new { RecordId = recordId };
+            return await _db.GetTextAsync(sproc, parameter);
         }
 
         public async Task<int> GetNoBiographyCountAsync()
         {
-            using var connection = _connectionFactory.CreateConnection();
-
             var sproc = "up_NoBioCount";
-            
-            return await connection.ExecuteScalarAsync<int>(sproc, commandType: CommandType.StoredProcedure);
+            return await _db.GetCountOrIdAsync(sproc, new { });
         }
 
         public async Task<Artist> ShowArtistAsync(int artistId)
         {
-            using var connection = _connectionFactory.CreateConnection();
             var sproc = "up_ArtistSelectById";
-            var parameter = new DynamicParameters();
-            parameter.Add("@ArtistId", artistId);
-            IEnumerable<Artist> artist = await connection.QueryAsync<Artist>(sproc, parameter, commandType: CommandType.StoredProcedure);
-
-            return artist?.FirstOrDefault() ?? null;
+            var parameter = new { ArtistId = artistId };
+            return await _db.GetSingleAsync<Artist>(sproc, parameter);
         }
 
         public async Task<int> UpdateArtistAsync(Artist artist)

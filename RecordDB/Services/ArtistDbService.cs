@@ -22,7 +22,7 @@ namespace RecordDB.Services
 
         public async Task RunAllDatabaseOperations()
         {
-            await GetAllArtistsAsync();
+            // await GetAllArtistsAsync();
             // await FixBandArtistsAsync();
             // await DisplayAllArtistsAsync();
             // await GetArtistByIdAsync(114);
@@ -31,7 +31,7 @@ namespace RecordDB.Services
             // await AddArtistAsync();
             // await AddArtistWithoutFirstNameAsync();
             // await AddArtistFromFieldsAsync();
-            // await CheckForArtistNameAsync("Alan Robson");
+            // await CheckForArtistNameAsync("Charley Robson");
             // await DeleteArtistAsync(860);
             // await DeleteArtistAsync("Alan Robson");
             // await GetArtistByFirstLastNameAsync("Bob", "Dylan");

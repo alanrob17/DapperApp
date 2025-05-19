@@ -13,12 +13,10 @@ namespace RecordDB.Repositories
 {
     public class RecordRepository : IRecordRepository
     {
-        private readonly IDbConnectionFactory _connectionFactory;
         private readonly IDataAccess _db;
 
-        public RecordRepository(IDbConnectionFactory connectionFactory, IDataAccess db)
+        public RecordRepository(IDataAccess db)
         {
-            _connectionFactory = connectionFactory;
             _db = db;
         }
 
@@ -57,23 +55,6 @@ namespace RecordDB.Repositories
         public async Task<int> UpdateRecordAsync(Record record)
         {
             return await _db.SaveDataAsync("adm_UpdateRecord", record, outputParameterName: "RowsAffected");
-            //using var connection = _connectionFactory.CreateConnection();
-            //var parameters = new DynamicParameters();
-            //parameters.Add("@RecordId", record.RecordId);
-            //parameters.Add("@Name", record.Name);
-            //parameters.Add("@Field", record.Field);
-            //parameters.Add("@Recorded", record.Recorded);
-            //parameters.Add("@Label", record.Label);
-            //parameters.Add("@Pressing", record.Pressing);
-            //parameters.Add("@Rating", record.Rating);
-            //parameters.Add("@Discs", record.Discs);
-            //parameters.Add("@Media", record.Media);
-            //parameters.Add("@Bought", record.Bought);
-            //parameters.Add("@Cost", record.Cost);
-            //parameters.Add("@CoverName", null);
-            //parameters.Add("@Review", record.Review);
-            //var recordId = await connection.ExecuteAsync("adm_UpdateRecord", parameters, commandType: CommandType.StoredProcedure);
-            //return parameters.Get<int>("@RecordId");
         }
 
         public async Task<IEnumerable<Record>> GetRecordsByArtistIdAsync(int artistId)
@@ -122,8 +103,6 @@ namespace RecordDB.Repositories
 
         public async Task<int> UpdateRecordAsync(int recordId, string name, string field, int recorded, string label, string pressing, string rating, int discs, string media, DateTime bought, decimal cost, string coverName, string review)
         {
-            //using var connection = _connectionFactory.CreateConnection();
-
             var record = new Record
             {
                 RecordId = recordId,
@@ -143,7 +122,6 @@ namespace RecordDB.Repositories
             };
 
             return await _db.SaveDataAsync("adm_UpdateRecord", record, outputParameterName: "RowsAffected");
-            // return await connection.ExecuteAsync("adm_UpdateRecord", new { Record = record}, commandType: CommandType.StoredProcedure);
         }
 
         public async Task<string> CountDiscsAsync(string show)

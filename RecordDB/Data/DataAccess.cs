@@ -17,6 +17,7 @@ namespace RecordDB.Data
     public class DataAccess : IDataAccess
     {
         private readonly IDbConnectionFactory _connectionFactory;
+        
         private readonly ILogger<DataAccess> _logger;
 
         public DataAccess(IDbConnectionFactory connectionFactory, ILogger<DataAccess> logger)

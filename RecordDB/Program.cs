@@ -53,8 +53,8 @@ namespace RecordDB
             var artistDbService = host.Services.GetRequiredService<ArtistDbService>();
             await artistDbService.RunAllDatabaseOperations();
 
-            // var recordDbService = host.Services.GetRequiredService<RecordDbService>();
-            // await recordDbService.RunAllDatabaseOperations();
+            //var recordDbService = host.Services.GetRequiredService<RecordDbService>();
+            //await recordDbService.RunAllDatabaseOperations();
         }
     }
 }
