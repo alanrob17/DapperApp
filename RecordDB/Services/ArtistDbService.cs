@@ -32,7 +32,7 @@ namespace RecordDB.Services
             // await AddArtistWithoutFirstNameAsync();
             // await AddArtistFromFieldsAsync();
             // await CheckForArtistNameAsync("Charley Robson");
-            // await DeleteArtistAsync(860);
+            // await DeleteArtistAsync(883);
             // await DeleteArtistAsync("Alan Robson");
             // await GetArtistByFirstLastNameAsync("Bob", "Dylan");
             // await GetArtistByNameAsync("Bob Dylan");
@@ -41,7 +41,7 @@ namespace RecordDB.Services
             // await GetArtistsWithNoBioAsync();
             // await GetBiographyAsync(114);
             // await GetNoBiographyCountAsync();
-            // await UpdateArtistAsync(870, "Alan", "Robson", "Alan Robson", "Alan is a Rock music star.");
+            // await UpdateArtistAsync(861, "Charles", "Robson", "Charles Robson", "Charles is a Jazz music star.");
             // await UpdateArtistAsync();
             // await GetBiographyFromRecordIdAsync(5249);
             // await GetArtistNameFromRecordIdAsync(5249);
@@ -124,7 +124,7 @@ namespace RecordDB.Services
             var firstName = "Alanzo";
             var lastName = "Robosono";
             var name = "Alanzo Robosono";
-            var biography = "Alan is a Rock music star.";
+            var biography = "Alan is a Qualli music star.";
 
             var updated = await _repository.UpdateArtistAsync(artistId, firstName, lastName, name, biography);
             if (updated > 0)
@@ -248,7 +248,8 @@ namespace RecordDB.Services
             {
                 FirstName = "Alan",
                 LastName = "Robson",
-                Biography = "Alan is a drone music star."
+                Name = string.Empty,
+                Biography = "Alan is a Rock music star."
             };
 
             var result = await _repository.AddArtistAsync(artist);
@@ -285,6 +286,7 @@ namespace RecordDB.Services
         {
             var firstName = "Andrew";
             var lastName = "Robson";
+            var name = string.Empty;
             var biography = "Andrew is a Jazz crooner.";
 
             var result = await _repository.AddArtistAsync(firstName, lastName, biography);
@@ -315,8 +317,9 @@ namespace RecordDB.Services
 
         private async Task DeleteArtistAsync(int artistId)
         {
-            bool deleted = await _repository.DeleteArtistAsync(artistId);
-
+            var deleted = await _repository.DeleteArtistAsync(artistId);
+            
+            // This produces an error but deletes the record.
             if (deleted)
             {
                 _output.WriteLine($"Successfully deleted artist (ID: {artistId})");
@@ -365,30 +368,6 @@ namespace RecordDB.Services
             else
             {
                 _output.WriteError($"Artist with name {firstName} {lastName} not found.");
-            }
-        }
-
-        public async Task FixBandArtistsAsync()
-        {
-            var artists = await _repository.GetBandArtistsAsync();
-            foreach (var artist in artists)
-            {
-                var firstName = string.Empty;
-                artist.FirstName = firstName;
-                artist.LastName = $"The {artist.LastName}";
-                artist.Name = $"{artist.LastName}";
-
-                _output.WriteLine($"Id: {artist.ArtistId}, FirstName: {artist.FirstName}, LastName: {artist.LastName}, Name: {artist.LastName}");
-            }
-
-            foreach (var artist in artists)
-            {
-                bool updated = await _repository.UpdateArtistsBandTitlesAsync(artist);
-
-                if (!updated)
-                {
-                    _output.WriteError($"ArtistId: {artist.ArtistId}, Name: {artist.Name} not Updated!");
-                }
             }
         }
 

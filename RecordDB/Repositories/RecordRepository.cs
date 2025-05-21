@@ -29,7 +29,7 @@ namespace RecordDB.Repositories
         {
             var sproc = "up_DeleteRecord";
             var parameter = new { RecordId = recordId };
-            var rowsAffected = await _db.DeleteDataAsync("up_deleteRecord", parameter);
+            var rowsAffected = await _db.DeleteDataAsync(sproc, parameter);
             return rowsAffected > 0;
         }
         

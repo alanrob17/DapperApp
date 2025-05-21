@@ -27,7 +27,7 @@ namespace RecordDB.Services
             // await CountTotalRecordsAsync();
             // await GetRecordsByArtistIdAsync(114);
             // await AddNewRecord();
-            // await AddNewRecord(861, "Hip-Hop Rebellion", "Rock", 2025, "Wobble Dobble Music", "Aus", "***", 1, "CD", DateTime.Now, 19.99m, "", "This is Charlie's second album.");
+            await AddNewRecord(861, "Hip-Hop Rebellion", "Rock", 2025, "Wobble Dobble Music", "Aus", "***", 1, "CD", DateTime.Now, 19.99m, "", "This is Charlie's second album.");
             // await DeleteRecordAsync(5292);
             // await UpdateRecordAsync();
             // await UpdateRecordAsync(5291, "Rockin' The Boogie Bass Again", "Rock", 2023, "Wibble Wobble Music", "Aus", "***", 1, "CD", DateTime.Now, 19.99m, "", "This is Charlies's second album.");

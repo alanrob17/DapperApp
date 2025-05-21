@@ -16,43 +16,41 @@ namespace RecordDB.Repositories
 {
     public class ArtistRepository : IArtistRepository
     {
-        private readonly IDbConnectionFactory _connectionFactory;
         private readonly IDataAccess _db;
 
-        public ArtistRepository(IDbConnectionFactory connectionFactory, IDataAccess db)
+        public ArtistRepository(IDataAccess db)
         {
-            _connectionFactory = connectionFactory;
             _db = db;
         }
 
         public async Task<bool> AddArtistAsync(Artist artist)
         {
-            using var connection = _connectionFactory.CreateConnection();
+            var sproc = "adm_ArtistInsert";
             var parameters = new DynamicParameters();
             parameters.Add("@FirstName", artist.FirstName);
             parameters.Add("@LastName", artist.LastName);
-            parameters.Add("@Name", null);
+            parameters.Add("@Name", "");
             parameters.Add("@Biography", artist.Biography);
             parameters.Add("@ArtistId", 0);
             parameters.Add("@Result", dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
 
-            var affected = await connection.ExecuteAsync("adm_ArtistInsert", parameters, commandType: CommandType.StoredProcedure);
+            var affected = await _db.SaveDataAsync(sproc, artist, "Result", DbType.Int32);
             return affected > 0;
         }
 
         public async Task<bool> AddArtistAsync(string firstName, string lastName, string biography)
         {
-            using var connection = _connectionFactory.CreateConnection();
+            var artist = new Artist
+            {
+                ArtistId = 0,
+                FirstName = firstName,
+                LastName = lastName,
+                Name = string.Empty,
+                Biography = biography
+            };
 
-            var parameters = new DynamicParameters();
-            parameters.Add("@FirstName", firstName);
-            parameters.Add("@LastName", lastName);
-            parameters.Add("@Name", null);
-            parameters.Add("@Biography", biography);
-            parameters.Add("@ArtistId", 0);
-            parameters.Add("@Result", dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-
-            var affected = await connection.ExecuteAsync("adm_ArtistInsert", parameters, commandType: CommandType.StoredProcedure);
+            var sproc = "adm_ArtistInsert";
+            var affected = await _db.SaveDataAsync("adm_ArtistInsert", artist, "Result", DbType.Int32);
             return affected > 0;
         }
 
@@ -71,16 +69,25 @@ namespace RecordDB.Repositories
 
         public async Task<bool> DeleteArtistAsync(int artistId)
         {
-            using var connection = _connectionFactory.CreateConnection();
+            var sproc = "up_ArtistDelete";
+            var parameters = new DynamicParameters();
+            parameters.Add("@ArtistId", artistId);
+            parameters.Add("@Success", 0, DbType.Int32, ParameterDirection.Output);
 
-            return await connection.ExecuteScalarAsync<bool>("up_ArtistDelete", new { ArtistId = artistId }, commandType: CommandType.StoredProcedure);
+            int result =  await _db.DeleteDataAsync(sproc, parameters);
+            return result > 0;
+            //using var connection = _connectionFactory.CreateConnection();
+            //return await connection.ExecuteScalarAsync<bool>("up_ArtistDelete", new { ArtistId = artistId }, commandType: CommandType.StoredProcedure);
         }
 
         public async Task<bool> DeleteArtistAsync(string name)
         {
-            using var connection = _connectionFactory.CreateConnection();
-
-            return await connection.ExecuteScalarAsync<bool>("up_ArtistDeleteByName", new { Name = name }, commandType: CommandType.StoredProcedure);
+            var sproc = "up_ArtistDeleteByName";
+            var parameter = new { Name = name };
+            var rowsAffected = await _db.DeleteDataAsync(sproc, parameter);
+            return rowsAffected > 0;
+            //using var connection = _connectionFactory.CreateConnection();
+            //return await connection.ExecuteScalarAsync<bool>("up_ArtistDeleteByName", new { Name = name }, commandType: CommandType.StoredProcedure);
         }
 
         public async Task<Artist?> GetArtistByFirstLastNameAsync(string firstName, string lastName)
@@ -125,8 +132,8 @@ namespace RecordDB.Repositories
 
         public async Task<IEnumerable<Artist>> GetArtistListAsync()
         {
-            using var connection = _connectionFactory.CreateConnection();
-            return await connection.QueryAsync<Artist>("up_ArtistSelectAll", commandType: CommandType.StoredProcedure);
+            var sproc = "up_ArtistSelectAll";
+            return await _db.GetDataAsync<Artist>(sproc, new { });
         }
 
         public async Task<string> GetArtistNameAsync(int artistId)
@@ -149,15 +156,14 @@ namespace RecordDB.Repositories
 
         public async Task<IEnumerable<Artist>> GetArtistsWithNoBioAsync()
         {
-            using var connection = _connectionFactory.CreateConnection();
-
-            return await connection.QueryAsync<Artist>("up_selectArtistsWithNoBio", commandType: CommandType.StoredProcedure);
+            var sproc = "up_selectArtistsWithNoBio";
+            return await _db.GetDataAsync<Artist>(sproc, new { });
         }
 
         public async Task<IEnumerable<Artist>> GetBandArtistsAsync()
         {
-            using var connection = _connectionFactory.CreateConnection();
-            return await connection.QueryAsync<Artist>("up_ArtistsBandTitles", commandType: CommandType.StoredProcedure);
+            var sproc = "up_ArtistsBandTitles";
+            return await _db.GetDataAsync<Artist>(sproc, new { });
         }
 
         public async Task<Artist?> GetBiographyAsync(int artistId)
@@ -189,43 +195,22 @@ namespace RecordDB.Repositories
 
         public async Task<int> UpdateArtistAsync(Artist artist)
         {
-            using var connection = _connectionFactory.CreateConnection();
-
             var sproc = "up_UpdateArtist";
-
-            var parameters = new DynamicParameters();
-            parameters.Add("@ArtistId", artist.ArtistId);
-            parameters.Add("@FirstName", artist.FirstName);
-            parameters.Add("@LastName", artist.LastName);
-            parameters.Add("@Name", artist.Name);
-            parameters.Add("@Biography", artist.Biography);
-            parameters.Add("@Result", dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-
-            return await connection.ExecuteAsync(sproc, parameters, commandType: CommandType.StoredProcedure);
+            return await _db.SaveDataAsync(sproc, artist, "Result", DbType.Int32);
         }
 
         public async Task<int> UpdateArtistAsync(int artistId, string firstName, string lastName, string name, string biography)
         {
-            using var connection = _connectionFactory.CreateConnection();
-
             var sproc = "up_UpdateArtist";
-            var parameters = new DynamicParameters();
-            parameters.Add("@ArtistId", artistId);
-            parameters.Add("@FirstName", firstName);
-            parameters.Add("@LastName", lastName);
-            parameters.Add("@Name", name);
-            parameters.Add("@Biography", biography);
-            parameters.Add("@Result", dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
-
-            return await connection.ExecuteAsync(sproc, parameters, commandType: CommandType.StoredProcedure);
-        }
-
-        public async Task<bool> UpdateArtistsBandTitlesAsync(Artist artist)
-        {
-            using var connection = _connectionFactory.CreateConnection();
-            var affected = await connection.ExecuteAsync(
-                "UPDATE Artist SET FirstName = null, LastName = @LastName, Name = @Name, Biography = @Biography WHERE ArtistId = @ArtistId", artist);
-            return affected > 0;
+            var artist = new Artist
+            {
+                ArtistId = artistId,
+                FirstName = firstName,
+                LastName = lastName,
+                Name = name,
+                Biography = biography
+            };
+            return await _db.SaveDataAsync(sproc, artist, "Result", DbType.Int32);
         }
     }
 }

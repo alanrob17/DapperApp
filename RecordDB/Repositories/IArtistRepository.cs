@@ -10,7 +10,6 @@ namespace RecordDB.Repositories
     public interface IArtistRepository
     {
         Task<int> UpdateArtistAsync(Artist artist);
-        Task<bool> UpdateArtistsBandTitlesAsync(Artist artist);
         Task<Artist> GetArtistByIdAsync(int artistId);
         Task<string> GetArtistNameAsync(int artistId);
         Task<int> CountArtistsAsync();
