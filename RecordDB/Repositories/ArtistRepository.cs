@@ -26,13 +26,6 @@ namespace RecordDB.Repositories
         public async Task<bool> AddArtistAsync(Artist artist)
         {
             var sproc = "adm_ArtistInsert";
-            var parameters = new DynamicParameters();
-            parameters.Add("@FirstName", artist.FirstName);
-            parameters.Add("@LastName", artist.LastName);
-            parameters.Add("@Name", "");
-            parameters.Add("@Biography", artist.Biography);
-            parameters.Add("@ArtistId", 0);
-            parameters.Add("@Result", dbType: DbType.Int32, direction: ParameterDirection.InputOutput);
 
             var affected = await _db.SaveDataAsync(sproc, artist, "Result", DbType.Int32);
             return affected > 0;
@@ -42,7 +35,6 @@ namespace RecordDB.Repositories
         {
             var artist = new Artist
             {
-                ArtistId = 0,
                 FirstName = firstName,
                 LastName = lastName,
                 Name = string.Empty,
@@ -70,14 +62,10 @@ namespace RecordDB.Repositories
         public async Task<bool> DeleteArtistAsync(int artistId)
         {
             var sproc = "up_ArtistDelete";
-            var parameters = new DynamicParameters();
-            parameters.Add("@ArtistId", artistId);
-            parameters.Add("@Success", 0, DbType.Int32, ParameterDirection.Output);
+            var parameter = new { ArtistId = artistId };
 
-            int result =  await _db.DeleteDataAsync(sproc, parameters);
+            int result =  await _db.DeleteDataAsync(sproc, parameter);
             return result > 0;
-            //using var connection = _connectionFactory.CreateConnection();
-            //return await connection.ExecuteScalarAsync<bool>("up_ArtistDelete", new { ArtistId = artistId }, commandType: CommandType.StoredProcedure);
         }
 
         public async Task<bool> DeleteArtistAsync(string name)
@@ -86,8 +74,6 @@ namespace RecordDB.Repositories
             var parameter = new { Name = name };
             var rowsAffected = await _db.DeleteDataAsync(sproc, parameter);
             return rowsAffected > 0;
-            //using var connection = _connectionFactory.CreateConnection();
-            //return await connection.ExecuteScalarAsync<bool>("up_ArtistDeleteByName", new { Name = name }, commandType: CommandType.StoredProcedure);
         }
 
         public async Task<Artist?> GetArtistByFirstLastNameAsync(string firstName, string lastName)

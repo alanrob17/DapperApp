@@ -90,8 +90,7 @@ namespace RecordDB.Repositories
         public async Task<IEnumerable<Record>> GetArtistRecordsAsync(int artistId)
         {
             string sproc = "up_GetRecordsByArtistId";
-            var parameter = new DynamicParameters();
-            parameter.Add("@ArtistId", artistId);
+            var parameter = new { ArtistId = artistId};
             return await _db.GetDataAsync<Record>(sproc, parameter);
         }
 

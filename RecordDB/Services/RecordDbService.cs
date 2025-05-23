@@ -27,8 +27,8 @@ namespace RecordDB.Services
             // await CountTotalRecordsAsync();
             // await GetRecordsByArtistIdAsync(114);
             // await AddNewRecord();
-            await AddNewRecord(861, "Hip-Hop Rebellion", "Rock", 2025, "Wobble Dobble Music", "Aus", "***", 1, "CD", DateTime.Now, 19.99m, "", "This is Charlie's second album.");
-            // await DeleteRecordAsync(5292);
+            // await AddNewRecord(893, "Hip-Hop TipTop", "Rock", 2025, "Wobble Dobble Music", "Aus", "***", 1, "CD", DateTime.Now, 19.99m, "", "This is Charlie's second album.");
+            // await DeleteRecordAsync(5294);
             // await UpdateRecordAsync();
             // await UpdateRecordAsync(5291, "Rockin' The Boogie Bass Again", "Rock", 2023, "Wibble Wobble Music", "Aus", "***", 1, "CD", DateTime.Now, 19.99m, "", "This is Charlies's second album.");
             // await GetArtistRecordsAsync(114);
@@ -377,9 +377,9 @@ namespace RecordDB.Services
         {
             var record = new Record
             {
-                RecordId = 5292,
+                RecordId = 5294,
                 ArtistId = 0,
-                Name = "Rockin' Bass Guitar Rebellion",
+                Name = "Uptown Guitar Rebellion",
                 Field = "Rock",
                 Recorded = 2023,
                 Label = "Wobble Music",
@@ -390,7 +390,7 @@ namespace RecordDB.Services
                 Bought = DateTime.Now,
                 Cost = 19.99m,
                 CoverName = "",
-                Review = "This is James' sixth album."
+                Review = "This is Andrew's sixth album."
             };
             var rowsAffected = await _repository.UpdateRecordAsync(record);
             if (rowsAffected > 0)
@@ -420,7 +420,7 @@ namespace RecordDB.Services
         {
             var recordId = await _repository.AddRecordAsync(new Record
             {
-                ArtistId = 861,
+                ArtistId = 893,
                 Name = "Hip Hop Extroadinaire!",
                 Field = "Jazz",
                 Recorded = 2024,
