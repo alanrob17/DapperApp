@@ -175,6 +175,13 @@ namespace RecordDB.Repositories
             return await _db.GetCountOrIdAsync(sproc, parameter);
         }
 
+        public async Task<decimal> GetTotalCostForYearAsync(int year)
+        {
+            // Get total cost from Bought field
+            var sproc = "up_GetTotalYearCost";
+            var parameter = new { Year = year };
+            return await _db.GetCostAsync<decimal>(sproc, parameter);
+        }
         public async Task<int> GetDiscCountForYearAsync(int year)
         {
             // Get count from Recorded field
@@ -187,6 +194,12 @@ namespace RecordDB.Repositories
         {
             var sproc = "up_GetTotalNumberOfAllRecords";
             return await _db.GetCountOrIdAsync(sproc, new { });
+        }
+
+        public async Task<decimal> GetTotalCostAsync()
+        {
+            var sproc = "up_GetTotalCostOfAllDiscs";
+            return await _db.GetCostAsync<decimal>(sproc, new { });
         }
 
         public async Task<ArtistRecord> GetRecordDetailsAsync(int recordId)
@@ -259,6 +272,40 @@ namespace RecordDB.Repositories
         {
             string sproc = "up_GetTotalNumberOfAllDVDs";
             return await _db.GetCountOrIdAsync(sproc, new { });
+        }
+
+        public Task<decimal> GetTotalCdCostAsync()
+        {
+            var sproc = "up_GetTotalCostOfAllCDs";
+            return _db.GetCostAsync<decimal>(sproc, new { });
+        }
+
+        public async Task<decimal> GetAverageCostForYearAsync(int year)
+        {
+            var averageCost = 0.0m;
+            var discs = await GetBoughtDiscCountForYearAsync(year);
+            var cost = await GetTotalCostForYearAsync(year);
+
+            if (discs > 0)
+            {
+                averageCost = (decimal)cost / discs;
+            }
+
+            return decimal.Round(averageCost, 2);
+        }
+
+        public async Task<decimal> GetAverageCdCostAsync()
+        {
+            var averageCost = 0.0m;
+            var discs = await GetTotalNumberOfCDsAsync();
+            var cost = await GetTotalCdCostAsync();
+
+            if (discs > 0)
+            {
+                averageCost = (decimal)cost / discs;
+            }
+
+            return decimal.Round(averageCost, 2);
         }
     }
 }

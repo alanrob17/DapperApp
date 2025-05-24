@@ -1,6 +1,10 @@
 ﻿using Dapper;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.Data.SqlClient;
+using Microsoft.Extensions.Logging;
 using RecordDB.Data.Interfaces;
+using RecordDB.Models;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -8,9 +12,6 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using static Dapper.SqlMapper;
-using Microsoft.Extensions.Logging;
-using Serilog;
-using Microsoft.Data.SqlClient;
 
 namespace RecordDB.Data
 {
@@ -98,6 +99,14 @@ namespace RecordDB.Data
             return result;
         }
 
+        public async Task<int> GetCountOrIdQueryAsync(string query)
+        {
+            using var connection = _connectionFactory.CreateConnection();
+            var result = await connection.ExecuteScalarAsync<int>(query);
+            _logger.LogInformation("Successfully executed {query}, returned {Count} items", query, result);
+            return result;
+        }
+
         public async Task<string> GetTextAsync(string storedProcedureName, object parameters = null)
         {
             var dynamicParameters = new DynamicParameters(parameters);
@@ -133,6 +142,49 @@ namespace RecordDB.Data
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting record using parameter: {parameter} and procedure {Procedure}", parameter, storedProcedureName);
+                throw;
+            }
+        }
+
+        public async Task<decimal> GetCostAsync<T>(string storedProcedureName)
+        {
+            return await GetCostAsync<T>(storedProcedureName, null);
+        }
+
+        public async Task<decimal> GetCostAsync<T>(string storedProcedureName, object parameter = null)
+        {
+            using var connection = _connectionFactory.CreateConnection();
+            decimal cost = 0.0m;
+
+            try
+            {
+                cost = await connection.ExecuteScalarAsync<decimal>(storedProcedureName, parameter, commandType: CommandType.StoredProcedure);
+
+                _logger.LogInformation("Successfully executed cost query: {Procedure}, returned cost: {Cost}", storedProcedureName, cost);
+                return cost;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error executing Cost query using parameter: {parameter} and procedure {Procedure}", parameter, storedProcedureName);
+                throw;
+            }
+        }
+
+        public async Task<decimal> GetCostQueryAsync<T>(string query)
+        {
+            using var connection = _connectionFactory.CreateConnection();
+            decimal cost = 0.0m;
+
+            try
+            {
+               cost = await connection.ExecuteScalarAsync<decimal>(query);
+
+                _logger.LogInformation("Successfully executed cost query: {Query}, returned cost: {Cost}", query, cost);
+                return cost;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error executing cost query: {Query}", query);
                 throw;
             }
         }

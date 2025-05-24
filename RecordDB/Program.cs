@@ -42,6 +42,8 @@ namespace RecordDB
                     services.AddScoped<ArtistDbService>();
                     services.AddScoped<IRecordRepository, RecordRepository>();
                     services.AddScoped<RecordDbService>();
+                    services.AddScoped<IStatisticRepository, StatisticRepository>();
+                    services.AddScoped<StatisticDbService>();
 
                     services.AddSingleton<IOutputService, ConsoleOutputService>();
                     services.AddScoped<ArtistDbService>();
@@ -50,11 +52,14 @@ namespace RecordDB
                 .UseSerilog()
                 .Build();
 
-            var artistDbService = host.Services.GetRequiredService<ArtistDbService>();
-            await artistDbService.RunAllDatabaseOperations();
+            // var artistDbService = host.Services.GetRequiredService<ArtistDbService>();
+            // await artistDbService.RunAllDatabaseOperations();
 
-            var recordDbService = host.Services.GetRequiredService<RecordDbService>();
-            await recordDbService.RunAllDatabaseOperations();
+            // var recordDbService = host.Services.GetRequiredService<RecordDbService>();
+            // await recordDbService.RunAllDatabaseOperations();
+
+            var statisticDbService = host.Services.GetRequiredService<StatisticDbService>();
+            await statisticDbService.RunAllDatabaseOperations();
         }
     }
 }

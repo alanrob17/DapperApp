@@ -11,6 +11,7 @@ namespace RecordDB.Data.Interfaces
     public interface IDataAccess
     {
         Task<int> GetCountOrIdAsync(string storedProcedureName, object parameters = null);
+        Task<int> GetCountOrIdQueryAsync(string query);
         Task<IEnumerable<T>> GetDataAsync<T>(string storedProcedureName);
         Task<IEnumerable<T>> GetDataAsync<T>(string storedProcedureName, object parameters);
         Task<T?> GetSingleAsync<T>(string storedProcedureName, object parameters) where T : class;
@@ -18,11 +19,8 @@ namespace RecordDB.Data.Interfaces
         Task<string> GetTextAsync(string storedProcedureName, object parameters = null);
         Task<int> SaveDataAsync<T>(string storedProcedureName, T entity, string outputParameterName = "Id", DbType outputDbType = DbType.Int32);
         Task<int> DeleteDataAsync(string storedProcedureName, object parameter);
-        //Task<IEnumerable<T>> GetAllAsync<T>(string sql, object? parameters = null);
-        //Task<T> GetSingleAsync<T>(string sql, object? parameters = null);
-        //Task<int> ExecuteAsync(string sql, object? parameters = null);
-        //Task<IEnumerable<T>> QueryAsync<T>(string sql, object? parameters = null);
-        //Task<T> QuerySingleAsync<T>(string sql, object? parameters = null);
-        //Task<int> ExecuteScalarAsync(string sql, object? parameters = null);
+        Task<decimal> GetCostQueryAsync<T>(string query);
+        Task<decimal> GetCostAsync<T>(string storedProcedureName);
+        Task<decimal> GetCostAsync<T>(string storedProcedure, object parameter = null);
     }
 }

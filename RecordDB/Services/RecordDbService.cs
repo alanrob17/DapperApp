@@ -25,6 +25,8 @@ namespace RecordDB.Services
             await GetAllRecordsAsync();
             // await GetRecordByIdAsync(1076);
             // await CountTotalRecordsAsync();
+            // await GetTotalCostAsync();
+            // await GetTotalCdCostAsync();
             // await GetRecordsByArtistIdAsync(114);
             // await AddNewRecord();
             // await AddNewRecord(893, "Hip-Hop TipTop", "Rock", 2025, "Wobble Dobble Music", "Aus", "***", 1, "CD", DateTime.Now, 19.99m, "", "This is Charlie's second album.");
@@ -42,6 +44,7 @@ namespace RecordDB.Services
             // await GetTotalNumberOfCDsAsync();
             // await GetNoReviewCountAsync();
             // await GetBoughtDiscCountForYearAsync(2022);
+            // await GetTotalCostForYearAsync(2017);
             // await GetTotalNumberOfDiscsAsync();
             // await GetRecordDetailsAsync(3232);
             // await GetTotalArtistCostAsync();
@@ -53,6 +56,19 @@ namespace RecordDB.Services
             // await GetTotalNumberOfRecordsAsync();
             // await GetTotalNumberOfBluraysAsync();
             // await GetTotalNumberOfDVDsAsync();
+        }
+
+        private async Task GetTotalCdCostAsync()
+        {
+            var totalCost = await _repository.GetTotalCdCostAsync();
+            if (totalCost > 0)
+            {
+                _output.WriteLine($"Total cost of all CDs: ${decimal.Round(totalCost, 2)}");
+            }
+            else
+            {
+                _output.WriteError("No CDs found.");
+            }
         }
 
         private async Task GetTotalNumberOfDVDsAsync()
@@ -91,6 +107,19 @@ namespace RecordDB.Services
             else
             {
                 _output.WriteError("No records found.");
+            }
+        }
+
+        private async Task GetTotalCostAsync()
+        {
+            var totalCost = await _repository.GetTotalCostAsync();
+            if (totalCost > 0)
+            {
+                _output.WriteLine($"Total cost of all discs: ${decimal.Round(totalCost, 2)}");
+            }
+            else
+            {
+                _output.WriteError("No discs found.");
             }
         }
 
@@ -192,6 +221,20 @@ namespace RecordDB.Services
                 _output.WriteError($"No bought discs found for year: {year}");
             }
         }
+
+        private async Task GetTotalCostForYearAsync(int year)
+        {
+            var totalCost = await _repository.GetTotalCostForYearAsync(year);
+            if (totalCost > 0)
+            {
+                _output.WriteLine($"Total cost of records bought in {year}: ${decimal.Round(totalCost, 2)}");
+            }
+            else
+            {
+                _output.WriteError($"No records found for year: {year}");
+            }
+        }
+
 
         private async Task GetDiscCountForYearAsync(int year)
         {

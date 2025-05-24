@@ -29,8 +29,11 @@ namespace RecordDB.Repositories
         Task<int> GetTotalNumberOfCDsAsync();
         Task<int> GetNoReviewCountAsync();
         Task<int> GetBoughtDiscCountForYearAsync(int year);
+        Task<decimal> GetTotalCostForYearAsync(int year);
         Task<int> GetDiscCountForYearAsync(int year);
         Task<int> GetTotalNumberOfDiscsAsync();
+        Task<decimal> GetTotalCostAsync();
+        Task<decimal> GetTotalCdCostAsync();
         Task<ArtistRecord> GetRecordDetailsAsync(int recordId);
         Task<string> GetArtistNameFromRecordAsync(int recordId);
         Task<IEnumerable<Total>> GetTotalArtistCostAsync();
@@ -40,5 +43,7 @@ namespace RecordDB.Repositories
         Task<int> GetTotalNumberOfRecordsAsync();
         Task<int> GetTotalNumberOfDVDsAsync();
         Task<int> GetTotalNumberOfBluraysAsync();
+        Task<decimal> GetAverageCostForYearAsync(int year);
+        Task<decimal> GetAverageCdCostAsync();
     }
 }
