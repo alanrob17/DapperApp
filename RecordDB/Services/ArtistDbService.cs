@@ -60,7 +60,7 @@ namespace RecordDB.Services
                     biography = artist.Biography.Substring(0, 60);
                 }
 
-                _output.WriteLine($"Id: {artist.ArtistId}, Name: {artist.Name} - {biography}");
+                await _output.WriteLineAsync($"Id: {artist.ArtistId}, Name: {artist.Name} - {biography}");
             }
         }
 
@@ -69,11 +69,11 @@ namespace RecordDB.Services
             var artistName = await _repository.GetArtistNameAsync(artistId);
             if (!string.IsNullOrEmpty(artistName))
             {
-                _output.WriteLine($"Artist Name: {artistName}");
+                await _output.WriteLineAsync($"Artist Name: {artistName}");
             }
             else
             {
-                _output.WriteError($"No artist found for ArtistId: {artistId}");
+                await _output.WriteErrorAsync($"No artist found for ArtistId: {artistId}");
             }
         }
 
@@ -83,11 +83,11 @@ namespace RecordDB.Services
             if (artist is not null)
             {
                 var artistHtml = ToHtml(artist);
-                _output.WriteLine(artistHtml);
+                await _output.WriteLineAsync(artistHtml);
             }
             else
             {
-                _output.WriteError($"ArtistId: {artistId} not found.");
+                await _output.WriteErrorAsync($"ArtistId: {artistId} not found.");
             }
         }
 
@@ -96,11 +96,11 @@ namespace RecordDB.Services
             var artistName = await _repository.GetArtistNameByRecordIdAsync(recordId);
             if (!string.IsNullOrEmpty(artistName))
             {
-                _output.WriteLine($"Artist Name: {artistName}");
+                await _output.WriteLineAsync($"Artist Name: {artistName}");
             }
             else
             {
-                _output.WriteError($"No artist found for RecordId: {recordId}");
+                await _output.WriteErrorAsync($"No artist found for RecordId: {recordId}");
             }
         }
 
@@ -109,11 +109,11 @@ namespace RecordDB.Services
             var biography = await _repository.GetBiographyFromRecordIdAsync(recordId);
             if (!string.IsNullOrEmpty(biography))
             {
-                _output.WriteLine($"Biography: {biography}");
+                await _output.WriteLineAsync($"Biography: {biography}");
             }
             else
             {
-                _output.WriteError($"No biography found for RecordId: {recordId}");
+                await _output.WriteErrorAsync($"No biography found for RecordId: {recordId}");
             }
         }
 
@@ -128,11 +128,11 @@ namespace RecordDB.Services
             var updated = await _repository.UpdateArtistAsync(artistId, firstName, lastName, name, biography);
             if (updated > 0)
             {
-                _output.WriteLine($"Artist {name} updated successfully.");
+                await _output.WriteLineAsync($"Artist {name} updated successfully.");
             }
             else
             {
-                _output.WriteError($"Failed to update artist {name}.");
+                await _output.WriteErrorAsync($"Failed to update artist {name}.");
             }
         }
 
@@ -149,18 +149,18 @@ namespace RecordDB.Services
             int updated = await _repository.UpdateArtistAsync(artist);
             if (updated > 0)
             {
-                _output.WriteLine($"Artist {artist.Name} updated successfully.");
+                await _output.WriteLineAsync($"Artist {artist.Name} updated successfully.");
             }
             else
             {
-                _output.WriteError($"Failed to update artist {artist.Name}.");
+                await _output.WriteErrorAsync($"Failed to update artist {artist.Name}.");
             }
         }
 
         private async Task GetNoBiographyCountAsync()
         {
             int count = await _repository.GetNoBiographyCountAsync();
-            _output.WriteLine($"Total Artists with no biography: {count}");
+            await _output.WriteLineAsync($"Total Artists with no biography: {count}");
         }
 
         private async Task GetBiographyAsync(int artistId)
@@ -169,11 +169,11 @@ namespace RecordDB.Services
             if (artist is not null)
             {
                 var biography = ToHtml(artist);
-                _output.WriteLine(biography);
+                await _output.WriteLineAsync(biography);
             }
             else
             {
-                _output.WriteError($"ArtistId: {artistId} not found.");
+                await _output.WriteErrorAsync($"ArtistId: {artistId} not found.");
             }
         }
 
@@ -181,11 +181,11 @@ namespace RecordDB.Services
         {
             var artists = await _repository.GetArtistsWithNoBioAsync();
             
-            _output.WriteLine($"Artists with no biography: {artists.Count()}");
+            await _output.WriteLineAsync($"Artists with no biography: {artists.Count()}");
 
             foreach (var artist in artists)
             {
-                _output.WriteLine($"Id: {artist.ArtistId}, Name: {artist.Name}");
+                await _output.WriteLineAsync($"Id: {artist.ArtistId}, Name: {artist.Name}");
             }
         }
 
@@ -194,11 +194,11 @@ namespace RecordDB.Services
             var artistId = await _repository.GetArtistIdFromRecordAsync(recordId);
             if (artistId > 0)
             {
-                _output.WriteLine($"ArtistId: {artistId} found for RecordId: {recordId}");
+                await _output.WriteLineAsync($"ArtistId: {artistId} found for RecordId: {recordId}");
             }
             else
             {
-                _output.WriteError($"ArtistId not found for RecordId: {recordId}");
+                await _output.WriteErrorAsync($"ArtistId not found for RecordId: {recordId}");
             }
         }
 
@@ -207,11 +207,11 @@ namespace RecordDB.Services
             var artistId = await _repository.GetArtistIdAsync(firstName, lastName);
             if (artistId > 0)
             {
-                _output.WriteLine($"ArtistId: {artistId} found for {firstName} {lastName}");
+                await _output.WriteLineAsync($"ArtistId: {artistId} found for {firstName} {lastName}");
             }
             else
             {
-                _output.WriteError($"ArtistId not found for {firstName} {lastName}");
+                await _output.WriteErrorAsync($"ArtistId not found for {firstName} {lastName}");
             }
         }
 
@@ -220,11 +220,11 @@ namespace RecordDB.Services
             var artist = await _repository.GetArtistByNameAsync(name);
             if (artist is not null)
             {
-                _output.WriteLine($"Artist: {artist.Name} found with Id: {artist.ArtistId}");
+                await _output.WriteLineAsync($"Artist: {artist.Name} found with Id: {artist.ArtistId}");
             }
             else
             {
-                _output.WriteError($"Artist with name {name} not found.");
+                await _output.WriteErrorAsync($"Artist with name {name} not found.");
             }
         }
 
@@ -233,11 +233,11 @@ namespace RecordDB.Services
             var result = await _repository.CheckForArtistNameAsync(name);
             if (result)
             {
-                _output.WriteLine($"Artist {name} exists in the database.");
+                await _output.WriteLineAsync($"Artist {name} exists in the database.");
             }
             else
             {
-                _output.WriteError($"Artist {name} does not exist in the database.");
+                await _output.WriteErrorAsync($"Artist {name} does not exist in the database.");
             }
         }
 
@@ -255,11 +255,11 @@ namespace RecordDB.Services
 
             if (result)
             {
-                _output.WriteLine($"Artist {artist.FirstName} {artist.LastName} added successfully.");
+                await _output.WriteLineAsync($"Artist {artist.FirstName} {artist.LastName} added successfully.");
             }
             else
             {
-                _output.WriteError($"Failed to add artist {artist.FirstName} {artist.LastName}.");
+                await _output.WriteErrorAsync($"Failed to add artist {artist.FirstName} {artist.LastName}.");
             }
         }
 
@@ -273,11 +273,11 @@ namespace RecordDB.Services
 
             if (result)
             {
-                _output.WriteLine($"Artist {firstName} {lastName} added successfully.");
+                await _output.WriteLineAsync($"Artist {firstName} {lastName} added successfully.");
             }
             else
             {
-                _output.WriteError($"Failed to add artist {firstName} {lastName}.");
+                await _output.WriteErrorAsync($"Failed to add artist {firstName} {lastName}.");
             }
         }
 
@@ -292,11 +292,11 @@ namespace RecordDB.Services
 
             if (result)
             {
-                _output.WriteLine($"Artist {firstName} {lastName} added successfully.");
+                await _output.WriteLineAsync($"Artist {firstName} {lastName} added successfully.");
             }
             else
             {
-                _output.WriteError($"Failed to add artist {firstName} {lastName}.");
+                await _output.WriteErrorAsync($"Failed to add artist {firstName} {lastName}.");
             }
         }
 
@@ -306,11 +306,11 @@ namespace RecordDB.Services
 
             if (deleted)
             {
-                _output.WriteLine($"Successfully deleted artist: {name}");
+                await _output.WriteLineAsync($"Successfully deleted artist: {name}");
             }
             else
             {
-                _output.WriteError($"Failed to delete artist: {name}");
+                await _output.WriteErrorAsync($"Failed to delete artist: {name}");
             }
         }
 
@@ -321,11 +321,11 @@ namespace RecordDB.Services
             // This produces an error but deletes the record.
             if (deleted)
             {
-                _output.WriteLine($"Successfully deleted artist (ID: {artistId})");
+                await _output.WriteLineAsync($"Successfully deleted artist (ID: {artistId})");
             }
             else
             {
-                _output.WriteError($"Failed to delete artist (ID: {artistId})");
+                await _output.WriteErrorAsync($"Failed to delete artist (ID: {artistId})");
             }
         }
 
@@ -353,7 +353,7 @@ namespace RecordDB.Services
 
             foreach (var artist in artistDictionary)
             {
-                _output.WriteLine($"Id: {artist.Key}, Name: {artist.Value}");
+                await _output.WriteLineAsync($"Id: {artist.Key}, Name: {artist.Value}");
             }
         }
 
@@ -362,11 +362,11 @@ namespace RecordDB.Services
             var artist = await _repository.GetArtistByFirstLastNameAsync(firstName, lastName);
             if (artist is not null)
             {
-                _output.WriteLine($"Artist: {artist.Name} found with Id: {artist.ArtistId}");
+                await _output.WriteLineAsync($"Artist: {artist.Name} found with Id: {artist.ArtistId}");
             }
             else
             {
-                _output.WriteError($"Artist with name {firstName} {lastName} not found.");
+                await _output.WriteErrorAsync($"Artist with name {firstName} {lastName} not found.");
             }
         }
 
@@ -375,7 +375,7 @@ namespace RecordDB.Services
             var artists = await _repository.GetArtistListAsync();
             foreach (var artist in artists)
             {
-                _output.WriteLine($"Id: {artist.ArtistId}, Name: {artist.Name}");
+                await _output.WriteLineAsync($"Id: {artist.ArtistId}, Name: {artist.Name}");
             }
         }
 
@@ -385,18 +385,18 @@ namespace RecordDB.Services
 
             if (artist is not null)
             {
-                _output.WriteLine($"Id: {artist.ArtistId} returns: {artist.Name}");
+                await _output.WriteLineAsync($"Id: {artist.ArtistId} returns: {artist.Name}");
             }
             else
             {
-                _output.WriteError($"ArtistId: {artistId} not found.");
+                await _output.WriteErrorAsync($"ArtistId: {artistId} not found.");
             }
         }
 
         private async Task CountArtistsAsync()
         {
             var count = await _repository.CountArtistsAsync();
-            _output.WriteLine($"Total Artists: {count}");
+            await _output.WriteLineAsync($"Total Artists: {count}");
         }
 
         // Return Artist as Html - RecordEfConsole

@@ -8,13 +8,16 @@ namespace RecordDB.Services.Output
 {
     public class ConsoleOutputService: IOutputService
     {
-        public void WriteLine(string message) => Console.WriteLine(message);
+        public async Task WriteLineAsync(string message)
+        {
+            await Console.Out.WriteLineAsync(message);
+        }
 
-        public void WriteError(string message)
+        public async Task WriteErrorAsync(string message)
         {
             var originalColor = Console.ForegroundColor;
             Console.ForegroundColor = ConsoleColor.Red;
-            Console.WriteLine(message);
+            await Console.Out.WriteLineAsync(message);
             Console.ForegroundColor = originalColor;
         }
     }

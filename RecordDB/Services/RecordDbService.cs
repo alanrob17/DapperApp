@@ -63,11 +63,11 @@ namespace RecordDB.Services
             var totalCost = await _repository.GetTotalCdCostAsync();
             if (totalCost > 0)
             {
-                _output.WriteLine($"Total cost of all CDs: ${decimal.Round(totalCost, 2)}");
+                await _output.WriteLineAsync($"Total cost of all CDs: ${decimal.Round(totalCost, 2)}");
             }
             else
             {
-                _output.WriteError("No CDs found.");
+                await _output.WriteErrorAsync("No CDs found.");
             }
         }
 
@@ -76,11 +76,11 @@ namespace RecordDB.Services
             var total = await _repository.GetTotalNumberOfDVDsAsync();
             if (total > 0)
             {
-                _output.WriteLine($"Total number of DVDs: {total}");
+                await _output.WriteLineAsync($"Total number of DVDs: {total}");
             }
             else
             {
-                _output.WriteError("No DVDs found.");
+                await _output.WriteErrorAsync("No DVDs found.");
             }
         }
 
@@ -89,11 +89,11 @@ namespace RecordDB.Services
             var total = await _repository.GetTotalNumberOfBluraysAsync();
             if (total > 0)
             {
-                _output.WriteLine($"Total number of Blurays: {total}");
+                await _output.WriteLineAsync($"Total number of Blurays: {total}");
             }
             else
             {
-                _output.WriteError("No Blurays found.");
+                await _output.WriteErrorAsync("No Blurays found.");
             }
         }
 
@@ -102,11 +102,11 @@ namespace RecordDB.Services
             var total = await _repository.GetTotalNumberOfRecordsAsync();
             if (total > 0)
             {
-                _output.WriteLine($"Total number of records: {total}");
+                await _output.WriteLineAsync($"Total number of records: {total}");
             }
             else
             {
-                _output.WriteError("No records found.");
+                await _output.WriteErrorAsync("No records found.");
             }
         }
 
@@ -115,11 +115,11 @@ namespace RecordDB.Services
             var totalCost = await _repository.GetTotalCostAsync();
             if (totalCost > 0)
             {
-                _output.WriteLine($"Total cost of all discs: ${decimal.Round(totalCost, 2)}");
+                await _output.WriteLineAsync($"Total cost of all discs: ${decimal.Round(totalCost, 2)}");
             }
             else
             {
-                _output.WriteError("No discs found.");
+                await _output.WriteErrorAsync("No discs found.");
             }
         }
 
@@ -128,7 +128,7 @@ namespace RecordDB.Services
             var records = await _repository.GetArtistRecordListAsync();
             foreach (var record in records)
             {
-                _output.WriteLine($"ArtistId: {record.ArtistId}, Artist: {record.ArtistName} - Record Id: {record.RecordId}, Name: {record.Name}, Recorded: {record.Recorded}, Media: {record.Media}");
+                await _output.WriteLineAsync($"ArtistId: {record.ArtistId}, Artist: {record.ArtistName} - Record Id: {record.RecordId}, Name: {record.Name}, Recorded: {record.Recorded}, Media: {record.Media}");
             }
         }
 
@@ -138,11 +138,11 @@ namespace RecordDB.Services
             if (record is not null)
             {
                 string recordHtml = RecordHtml(record);
-                _output.WriteLine(recordHtml);
+                await _output.WriteLineAsync(recordHtml);
             }
             else
             {
-                _output.WriteError($"Record with ID {recordId} not found.");
+                await _output.WriteErrorAsync($"Record with ID {recordId} not found.");
             }
         }
 
@@ -160,7 +160,7 @@ namespace RecordDB.Services
 
             foreach (var record in recordDictionary)
             {
-                _output.WriteLine($"Id: {record.Key}, Name: {record.Value}");
+                await _output.WriteLineAsync($"Id: {record.Key}, Name: {record.Value}");
             }
         }
 
@@ -169,7 +169,7 @@ namespace RecordDB.Services
             var totals = await _repository.GetTotalArtistDiscsAsync();
             foreach (var total in totals)
             {
-                _output.WriteLine($"ArtistId: {total.ArtistId}, Artist: {total.Name} - Total Discs: {total.TotalDiscs}");
+                await _output.WriteLineAsync($"ArtistId: {total.ArtistId}, Artist: {total.Name} - Total Discs: {total.TotalDiscs}");
             }
         }
 
@@ -178,7 +178,7 @@ namespace RecordDB.Services
             var totals = await _repository.GetTotalArtistCostAsync();
             foreach (var total in totals)
             {
-                _output.WriteLine($"ArtistId: {total.ArtistId}, Artist: {total.Name} - Total Discs: {total.TotalDiscs} - Total Cost: {total.TotalCost}");
+                await _output.WriteLineAsync($"ArtistId: {total.ArtistId}, Artist: {total.Name} - Total Discs: {total.TotalDiscs} - Total Cost: {total.TotalCost}");
             }
         }
 
@@ -188,11 +188,11 @@ namespace RecordDB.Services
             var record = await _repository.GetRecordDetailsAsync(recordId);
             if (record is not null)
             {
-                _output.WriteLine($"ArtistId: {record.ArtistId}, Artist: {record.ArtistName} -- Record Id: {record.RecordId}, Name: {record.Name}, Recorded: {record.Recorded}, Media: {record.Media}");
+                await _output.WriteLineAsync($"ArtistId: {record.ArtistId}, Artist: {record.ArtistName} -- Record Id: {record.RecordId}, Name: {record.Name}, Recorded: {record.Recorded}, Media: {record.Media}");
             }
             else
             {
-                _output.WriteError($"Record with ID {recordId} not found.");
+                await _output.WriteErrorAsync($"Record with ID {recordId} not found.");
             }
         }
 
@@ -201,11 +201,11 @@ namespace RecordDB.Services
             var total = await _repository.GetTotalNumberOfDiscsAsync();
             if (total > 0)
             {
-                _output.WriteLine($"Total number of discs: {total}");
+                await _output.WriteLineAsync($"Total number of discs: {total}");
             }
             else
             {
-                _output.WriteError("No discs found.");
+                await _output.WriteErrorAsync("No discs found.");
             }
         }
 
@@ -214,11 +214,11 @@ namespace RecordDB.Services
             var count = await _repository.GetBoughtDiscCountForYearAsync(year);
             if (count > 0)
             {
-                _output.WriteLine($"Total number of bought discs for year {year}: {count}");
+                await _output.WriteLineAsync($"Total number of bought discs for year {year}: {count}");
             }
             else
             {
-                _output.WriteError($"No bought discs found for year: {year}");
+                await _output.WriteErrorAsync($"No bought discs found for year: {year}");
             }
         }
 
@@ -227,11 +227,11 @@ namespace RecordDB.Services
             var totalCost = await _repository.GetTotalCostForYearAsync(year);
             if (totalCost > 0)
             {
-                _output.WriteLine($"Total cost of records bought in {year}: ${decimal.Round(totalCost, 2)}");
+                await _output.WriteLineAsync($"Total cost of records bought in {year}: ${decimal.Round(totalCost, 2)}");
             }
             else
             {
-                _output.WriteError($"No records found for year: {year}");
+                await _output.WriteErrorAsync($"No records found for year: {year}");
             }
         }
 
@@ -241,11 +241,11 @@ namespace RecordDB.Services
             var count = await _repository.GetDiscCountForYearAsync(year);
             if (count > 0)
             {
-                _output.WriteLine($"Total number of discs for year {year}: {count}");
+                await _output.WriteLineAsync($"Total number of discs for year {year}: {count}");
             }
             else
             {
-                _output.WriteError($"No discs found for year: {year}");
+                await _output.WriteErrorAsync($"No discs found for year: {year}");
             }
         }
 
@@ -254,11 +254,11 @@ namespace RecordDB.Services
             var count = await _repository.GetNoReviewCountAsync();
             if (count > 0)
             {
-                _output.WriteLine($"Total number of records with no reviews: {count}");
+                await _output.WriteLineAsync($"Total number of records with no reviews: {count}");
             }
             else
             {
-                _output.WriteError("No records found with no reviews.");
+                await _output.WriteErrorAsync("No records found with no reviews.");
             }
         }
 
@@ -267,11 +267,11 @@ namespace RecordDB.Services
             var total = await _repository.GetTotalNumberOfCDsAsync();
             if (total > 0)
             {
-                _output.WriteLine($"Total number of CD's: {total}");
+                await _output.WriteLineAsync($"Total number of CD's: {total}");
             }
             else
             {
-                _output.WriteError("No CD's found.");
+                await _output.WriteErrorAsync("No CD's found.");
             }
         }
 
@@ -280,11 +280,11 @@ namespace RecordDB.Services
             var records = await _repository.GetRecordNumberByYearAsync(year);
             if (records > 0)
             {
-                _output.WriteLine($"Total records for year {year}: {records}");
+                await _output.WriteLineAsync($"Total records for year {year}: {records}");
             }
             else
             {
-                _output.WriteError($"No records found for year: {year}");
+                await _output.WriteErrorAsync($"No records found for year: {year}");
             }
         }
 
@@ -293,11 +293,11 @@ namespace RecordDB.Services
             var artistName = await _repository.GetArtistNameFromRecordAsync(recordId);
             if (!string.IsNullOrEmpty(artistName))
             {
-                _output.WriteLine($"Artist Name: {artistName}");
+                await _output.WriteLineAsync($"Artist Name: {artistName}");
             }
             else
             {
-                _output.WriteError($"No artist found for record ID: {recordId}");
+                await _output.WriteErrorAsync($"No artist found for record ID: {recordId}");
             }
         }
 
@@ -309,16 +309,16 @@ namespace RecordDB.Services
                 var artistName = await _repository.GetArtistNameFromRecordAsync(record.RecordId);
                 if (artistName is not null)
                 {
-                    _output.WriteLine($"Artist: {artistName} - Record: {record.Name} - {record.Recorded}");
+                    await _output.WriteLineAsync($"Artist: {artistName} - Record: {record.Name} - {record.Recorded}");
                 }
                 else
                 {
-                    _output.WriteError($"No artist found for record: {name}");
+                    await _output.WriteErrorAsync($"No artist found for record: {name}");
                 }
             }
             else
             {
-                _output.WriteError($"Record: {name} not found.");
+                await _output.WriteErrorAsync($"Record: {name} not found.");
             }
         }
 
@@ -333,17 +333,17 @@ namespace RecordDB.Services
                     var artistName = await _repository.GetArtistNameFromRecordAsync(record.RecordId);
                     if (artistName is not null)
                     {
-                        _output.WriteLine($"Artist: {artistName} - Record: {record.Name} - {record.Recorded}");
+                        await _output.WriteLineAsync($"Artist: {artistName} - Record: {record.Name} - {record.Recorded}");
                     }
                     else
                     {
-                        _output.WriteError($"No artist found for record: {name}");
+                        await _output.WriteErrorAsync($"No artist found for record: {name}");
                     }
                 }
             }
             else
             {
-                _output.WriteError($"No records found for name: {name}");
+                await _output.WriteErrorAsync($"No records found for name: {name}");
             }
         }
 
@@ -352,18 +352,18 @@ namespace RecordDB.Services
             var records = await _repository.GetArtistNumberOfRecordsAsync(artistId);
             if (records is not null)
             {
-                _output.WriteLine($"ArtistId: {artistId} - Number of Records: {records}");
+                await _output.WriteLineAsync($"ArtistId: {artistId} - Number of Records: {records}");
             }
             else
             {
-                _output.WriteError($"No records found for ArtistId: {artistId}");
+                await _output.WriteErrorAsync($"No records found for ArtistId: {artistId}");
             }
         }
 
         private async Task CountDiscsAsync(string show)
         {
             var discs = await _repository.CountDiscsAsync(show);
-            _output.WriteLine($"{show}: Total Discs: {discs}");
+            await _output.WriteLineAsync($"{show}: Total Discs: {discs}");
         }
 
         private async Task GetNoRecordReviewsAsync()
@@ -371,7 +371,7 @@ namespace RecordDB.Services
             var records = await _repository.NoRecordReviewsAsync();
             foreach (var record in records)
             {
-                _output.WriteLine($"ArtistId: {record.ArtistId} - Artist: {record.ArtistName} - Record Id: {record.RecordId}: {record.Recorded} - {record.RecordName}");
+                await _output.WriteLineAsync($"ArtistId: {record.ArtistId} - Artist: {record.ArtistName} - Record Id: {record.RecordId}: {record.Recorded} - {record.RecordName}");
             }
         }
 
@@ -381,7 +381,7 @@ namespace RecordDB.Services
             var records = await _repository.GetArtistRecordsAsync(artistId);
             foreach (var record in records)
             {
-                _output.WriteLine($"Record Id: {record.RecordId}, Name: {record.Name}, Recorded: {record.Recorded}, Media: {record.Media}");
+                await _output.WriteLineAsync($"Record Id: {record.RecordId}, Name: {record.Name}, Recorded: {record.Recorded}, Media: {record.Media}");
             }
         }
 
@@ -408,11 +408,11 @@ namespace RecordDB.Services
             var rowsAffected = await _repository.UpdateRecordAsync(record);
             if (rowsAffected > 0)
             {
-                _output.WriteLine($"Record Id: {recordId} updated successfully.");
+                await _output.WriteLineAsync($"Record Id: {recordId} updated successfully.");
             }
             else
             {
-                _output.WriteError($"Failed to update record with Id: {recordId}.");
+                await _output.WriteErrorAsync($"Failed to update record with Id: {recordId}.");
             }
         }
 
@@ -438,11 +438,11 @@ namespace RecordDB.Services
             var rowsAffected = await _repository.UpdateRecordAsync(record);
             if (rowsAffected > 0)
             {
-                _output.WriteLine($"Record with ID {record.RecordId} updated successfully.");
+                await _output.WriteLineAsync($"Record with ID {record.RecordId} updated successfully.");
             }
             else
             {
-                _output.WriteError($"Failed to update record with ID {record.RecordId}.");
+                await _output.WriteErrorAsync($"Failed to update record with ID {record.RecordId}.");
             }
         }
 
@@ -451,11 +451,11 @@ namespace RecordDB.Services
             var result = await _repository.DeleteRecordAsync(recordId);
             if (result)
             {
-                _output.WriteLine($"Record with ID {recordId} deleted successfully.");
+                await _output.WriteLineAsync($"Record with ID {recordId} deleted successfully.");
             }
             else
             {
-                _output.WriteError($"Failed to delete record with ID {recordId}.");
+                await _output.WriteErrorAsync($"Failed to delete record with ID {recordId}.");
             }
         }
 
@@ -480,11 +480,11 @@ namespace RecordDB.Services
 
             if (recordId > 0)
             {
-                _output.WriteLine($"Record with Id: {recordId} added successfully");
+                await _output.WriteLineAsync($"Record with Id: {recordId} added successfully");
             }
             else
             {
-                _output.WriteError("Failed to add record!");
+                await _output.WriteErrorAsync("Failed to add record!");
             }
         }
 
@@ -509,18 +509,18 @@ namespace RecordDB.Services
 
             if (recordId > 0)
             {
-                _output.WriteLine($"Record added successfully with RecordId: {recordId}");
+                await _output.WriteLineAsync($"Record added successfully with RecordId: {recordId}");
             }
             else
             {
-                _output.WriteError("Failed to add record.");
+                await _output.WriteErrorAsync("Failed to add record.");
             }
         }
 
         private async Task CountTotalRecordsAsync()
         {
             var count = await _repository.CountTotalRecordsAsync();
-            _output.WriteLine($"Total Records: {count}");
+            await _output.WriteLineAsync($"Total Records: {count}");
         }
 
         private async Task GetRecordByIdAsync(int recordId)
@@ -529,11 +529,11 @@ namespace RecordDB.Services
 
             if (record is not null)
             {
-                _output.WriteLine($"Id: {record.RecordId} returns: {record.Recorded} - {record.Name} - media: {record.Media}");
+                await _output.WriteLineAsync($"Id: {record.RecordId} returns: {record.Recorded} - {record.Name} - media: {record.Media}");
             }
             else
             {
-                _output.WriteError($"RecordId: {recordId} not found.");
+                await _output.WriteErrorAsync($"RecordId: {recordId} not found.");
             }
         }
 
@@ -542,7 +542,7 @@ namespace RecordDB.Services
             var records = await _repository.GetAllRecordsAsync();
             foreach (var record in records)
             {
-                _output.WriteLine(record.ToString());
+                await _output.WriteLineAsync(record.ToString());
             }
         }
 
@@ -551,7 +551,7 @@ namespace RecordDB.Services
             var records = await _repository.GetRecordsByArtistIdAsync(artistId);
             foreach (var record in records)
             {
-                _output.WriteLine(record.ToString());
+                await _output.WriteLineAsync(record.ToString());
             }
         }
 
