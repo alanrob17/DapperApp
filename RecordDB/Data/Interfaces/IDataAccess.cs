@@ -19,8 +19,7 @@ namespace RecordDB.Data.Interfaces
         Task<string> GetTextAsync(string storedProcedureName, object parameters = null);
         Task<int> SaveDataAsync<T>(string storedProcedureName, T entity, string outputParameterName = "Id", DbType outputDbType = DbType.Int32);
         Task<int> DeleteDataAsync(string storedProcedureName, object parameter);
-        Task<decimal> GetCostQueryAsync<T>(string query);
-        Task<decimal> GetCostAsync<T>(string storedProcedureName);
-        Task<decimal> GetCostAsync<T>(string storedProcedure, object parameter = null);
+        Task<decimal> GetCostQueryAsync(string query);
+       Task<decimal> GetCostAsync(string storedProcedure, object parameter = null);
     }
 }

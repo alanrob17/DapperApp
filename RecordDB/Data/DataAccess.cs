@@ -146,47 +146,85 @@ namespace RecordDB.Data
             }
         }
 
-        public async Task<decimal> GetCostAsync<T>(string storedProcedureName)
-        {
-            return await GetCostAsync<T>(storedProcedureName, null);
-        }
-
-        public async Task<decimal> GetCostAsync<T>(string storedProcedureName, object parameter = null)
+        public async Task<decimal> GetCostAsync(string storedProcedureName, object parameters = null)
         {
             using var connection = _connectionFactory.CreateConnection();
-            decimal cost = 0.0m;
 
             try
             {
-                cost = await connection.ExecuteScalarAsync<decimal>(storedProcedureName, parameter, commandType: CommandType.StoredProcedure);
+                var cost = await connection.ExecuteScalarAsync<decimal>(
+                    storedProcedureName,
+                    parameters,
+                    commandType: CommandType.StoredProcedure);
 
-                _logger.LogInformation("Successfully executed cost query: {Procedure}, returned cost: {Cost}", storedProcedureName, cost);
+                _logger.LogInformation("Successfully executed stored procedure {Procedure}, returned value: {Value}", storedProcedureName, cost);
                 return cost;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error executing Cost query using parameter: {parameter} and procedure {Procedure}", parameter, storedProcedureName);
+                _logger.LogError(ex, "Error executing stored procedure {Procedure} with parameters {@Parameters}", storedProcedureName, parameters);
                 throw;
             }
         }
 
-        public async Task<decimal> GetCostQueryAsync<T>(string query)
+        public async Task<decimal> GetCostQueryAsync(string query)
         {
             using var connection = _connectionFactory.CreateConnection();
-            decimal cost = 0.0m;
 
             try
             {
-               cost = await connection.ExecuteScalarAsync<decimal>(query);
-
-                _logger.LogInformation("Successfully executed cost query: {Query}, returned cost: {Cost}", query, cost);
+                var cost = await connection.ExecuteScalarAsync<decimal>(query);
+                _logger.LogInformation("Successfully executed query: {Query}, returned value: {Value}", query, cost);
                 return cost;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error executing cost query: {Query}", query);
+                _logger.LogError(ex, "Error executing query: {Query}", query);
                 throw;
             }
         }
+
+        //public async Task<decimal> GetCostAsync<T>(string storedProcedureName)
+        //{
+        //    return await GetCostAsync<T>(storedProcedureName, null);
+        //}
+
+        //public async Task<decimal> GetCostAsync<T>(string storedProcedureName, object parameter = null)
+        //{
+        //    using var connection = _connectionFactory.CreateConnection();
+        //    decimal cost = 0.0m;
+
+        //    try
+        //    {
+        //        cost = await connection.ExecuteScalarAsync<decimal>(storedProcedureName, parameter, commandType: CommandType.StoredProcedure);
+
+        //        _logger.LogInformation("Successfully executed cost query: {Procedure}, returned cost: {Cost}", storedProcedureName, cost);
+        //        return cost;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error executing Cost query using parameter: {parameter} and procedure {Procedure}", parameter, storedProcedureName);
+        //        throw;
+        //    }
+        //}
+
+        //public async Task<decimal> GetCostQueryAsync<T>(string query)
+        //{
+        //    using var connection = _connectionFactory.CreateConnection();
+        //    decimal cost = 0.0m;
+
+        //    try
+        //    {
+        //       cost = await connection.ExecuteScalarAsync<decimal>(query);
+
+        //        _logger.LogInformation("Successfully executed cost query: {Query}, returned cost: {Cost}", query, cost);
+        //        return cost;
+        //    }
+        //    catch (Exception ex)
+        //    {
+        //        _logger.LogError(ex, "Error executing cost query: {Query}", query);
+        //        throw;
+        //    }
+        //}
     }
 }

@@ -180,7 +180,7 @@ namespace RecordDB.Repositories
             // Get total cost from Bought field
             var sproc = "up_GetTotalYearCost";
             var parameter = new { Year = year };
-            return await _db.GetCostAsync<decimal>(sproc, parameter);
+            return await _db.GetCostAsync(sproc, parameter);
         }
         public async Task<int> GetDiscCountForYearAsync(int year)
         {
@@ -199,7 +199,7 @@ namespace RecordDB.Repositories
         public async Task<decimal> GetTotalCostAsync()
         {
             var sproc = "up_GetTotalCostOfAllDiscs";
-            return await _db.GetCostAsync<decimal>(sproc, new { });
+            return await _db.GetCostAsync(sproc, new { });
         }
 
         public async Task<ArtistRecord> GetRecordDetailsAsync(int recordId)
@@ -277,7 +277,7 @@ namespace RecordDB.Repositories
         public Task<decimal> GetTotalCdCostAsync()
         {
             var sproc = "up_GetTotalCostOfAllCDs";
-            return _db.GetCostAsync<decimal>(sproc, new { });
+            return _db.GetCostAsync(sproc, new { });
         }
 
         public async Task<decimal> GetAverageCostForYearAsync(int year)
