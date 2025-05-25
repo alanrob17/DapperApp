@@ -273,32 +273,10 @@ Returns a scalar string.
     }
 ```
 
-### Get Cost as a Scalar value - no parameter
-
-```bash
-   decimal = GetCostAsync<decimal>(stored procedure);
-```
-
-#### Arguments
-
-* ``Stored Procedure`` - it will run this stored procedure
-
-Returns a scalar decimal cost.
-
-### Example
-
-```bash
-    public async Task<decimal> GetTotalCostAsync()
-    {
-        var sproc = "up_GetTotalCostOfAllDiscs";
-        return await _db.GetCostAsync<decimal>(sproc, new { });
-    }
-```
-
 ### Get Cost as a Scalar value - with parameter
 
 ```bash
-   decimal = GetCostAsync<decimal>(stored procedure, parameter);
+   decimal = GetCostAsync(parameter);
 ```
 
 #### Arguments
@@ -308,7 +286,19 @@ Returns a scalar decimal cost.
 
 Returns a scalar decimal cost.
 
-### Example
+### Examples
+
+Without a parameter.
+
+```bash
+    public async Task<decimal> GetTotalCostAsync()
+    {
+        var sproc = "up_GetTotalCostOfAllDiscs";
+        return await _db.GetCostAsync(sproc, new { });
+    }
+```
+
+With a parameter.
 
 ```bash
     public async Task<decimal> GetTotalCostForYearAsync(int year)
@@ -316,7 +306,6 @@ Returns a scalar decimal cost.
         // Get total cost from Bought field
         var sproc = "up_GetTotalYearCost";
         var parameter = new { Year = year };
-        return await _db.GetCostAsync<decimal>(sproc, parameter);
+        return await _db.GetCostAsync(sproc, parameter);
     }
 ```
-
