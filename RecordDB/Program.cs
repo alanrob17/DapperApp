@@ -18,48 +18,61 @@ namespace RecordDB
     {
         public static async Task Main(string[] args)
         {
+            // Configure Serilog early to capture startup logs
             Log.Logger = new LoggerConfiguration()
-            .MinimumLevel.Debug()
-            .WriteTo.Console()
-            .CreateLogger();
+                .MinimumLevel.Debug()
+                .WriteTo.Async(a => a.Console())
+                .CreateLogger();
 
-            var host = Host.CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((hostingContext, config) =>
-                {
-                    config.SetBasePath(Directory.GetCurrentDirectory());
-                    config.AddJsonFile("appsettings.json", optional: false);
-                })
-                .ConfigureServices((context, services) =>
-                {
-                    services.AddSingleton<IDbConnectionFactory, SqlConnectionFactory>();
+            try
+            {
+                Log.Information("Application starting up...");
 
-                    services.AddScoped<IDbConnection>(sp =>
-                        sp.GetRequiredService<IDbConnectionFactory>().CreateConnection());
+                var host = Host.CreateDefaultBuilder(args)
+                    .ConfigureAppConfiguration((hostingContext, config) =>
+                    {
+                        config.SetBasePath(Directory.GetCurrentDirectory());
+                        config.AddJsonFile("appsettings.json", optional: false);
 
-                    services.AddScoped<IDataAccess, DataAccess>();
-                    
-                    services.AddScoped<IArtistRepository, ArtistRepository>();
-                    services.AddScoped<ArtistDbService>();
-                    services.AddScoped<IRecordRepository, RecordRepository>();
-                    services.AddScoped<RecordDbService>();
-                    services.AddScoped<IStatisticRepository, StatisticRepository>();
-                    services.AddScoped<StatisticDbService>();
+                        // Optional: Add environment-specific config
+                        var env = hostingContext.HostingEnvironment;
+                        config.AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
+                    })
+                    .ConfigureServices((context, services) =>
+                    {
+                        // Your existing service registrations
+                        services.AddSingleton<IDbConnectionFactory, SqlConnectionFactory>();
+                        services.AddScoped<IDbConnection>(sp =>
+                            sp.GetRequiredService<IDbConnectionFactory>().CreateConnection());
 
-                    services.AddSingleton<IOutputService, ConsoleOutputService>();
-                    services.AddScoped<ArtistDbService>();
+                        services.AddScoped<IDataAccess, DataAccess>();
+                        services.AddScoped<IArtistRepository, ArtistRepository>();
+                        services.AddScoped<IRecordRepository, RecordRepository>();
+                        services.AddScoped<IStatisticRepository, StatisticRepository>();
 
-                })
-                .UseSerilog()
-                .Build();
+                        services.AddScoped<ArtistDbService>();
+                        services.AddScoped<RecordDbService>();
+                        services.AddScoped<StatisticDbService>();
 
-            var artistDbService = host.Services.GetRequiredService<ArtistDbService>();
-            await artistDbService.RunAllDatabaseOperations();
+                        services.AddSingleton<IOutputService, ConsoleOutputService>();
+                    })
+                    .UseSerilog() // This will use the logger we configured above
+                    .Build();
 
-            var recordDbService = host.Services.GetRequiredService<RecordDbService>();
-            await recordDbService.RunAllDatabaseOperations();
+                await host.Services.GetRequiredService<ArtistDbService>().RunAllDatabaseOperations();
+                await host.Services.GetRequiredService<RecordDbService>().RunAllDatabaseOperations();
+                await host.Services.GetRequiredService<StatisticDbService>().RunAllDatabaseOperations();
 
-            var statisticDbService = host.Services.GetRequiredService<StatisticDbService>();
-            await statisticDbService.RunAllDatabaseOperations();
+                Log.Information("All database operations completed successfully");
+            }
+            catch (Exception ex)
+            {
+                Log.Fatal(ex, "Application terminated unexpectedly");
+            }
+            finally
+            {
+                Log.CloseAndFlush(); // Ensure all logs are written before exiting
+            }
         }
     }
 }
