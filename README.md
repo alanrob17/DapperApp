@@ -15,7 +15,8 @@ The application consists of a data layer which contains generic Dapper methods t
 > Install-Package Microsoft.Extensions.Configuration         
 > Install-Package Microsoft.Extensions.Logging Install-Package Serilog      
 > Install-Package Serilog.Extensions.Hosting        
-> Install-Package Serilog.Sinks.Console
+> Install-Package Serilog.Sinks.Console     
+> Install-Package Serilog.Sinks.Async
 
 ## Repository methods
 
