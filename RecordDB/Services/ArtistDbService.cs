@@ -20,9 +20,8 @@ namespace RecordDB.Services
             _output = output;
         }
 
-        public async Task RunAllDatabaseOperations()
-        {
-            await GetAllArtistsAsync();
+        public async Task RunAllDatabaseOperations() =>
+            // await GetAllArtistsAsync();
             // await DisplayAllArtistsAsync();
             // await GetArtistByIdAsync(114);
             // await CountArtistsAsync();
@@ -40,13 +39,12 @@ namespace RecordDB.Services
             // await GetArtistsWithNoBioAsync();
             // await GetBiographyAsync(114);
             // await GetNoBiographyCountAsync();
-            // await UpdateArtistAsync(861, "Charles", "Robson", "Charles Robson", "Charles is a Jazz music star.");
-            // await UpdateArtistAsync();
+            // await UpdateArtistAsync(896, string.Empty, "The Wompoles", "The Wompoles", "The Wompoles are a Comedy music act.");
+            await UpdateArtistAsync();
             // await GetBiographyFromRecordIdAsync(5249);
             // await GetArtistNameFromRecordIdAsync(5249);
             // await ShowArtistAsync(114);
             // await GetArtistNameAsync(114);
-        }
 
         private async Task GetAllArtistsAsync()
         {
@@ -119,11 +117,11 @@ namespace RecordDB.Services
 
         private async Task UpdateArtistAsync()
         {
-            var artistId = 887;
-            var firstName = "Charley";
+            var artistId = 895;
+            var firstName = "Ethan J";
             var lastName = "Robson";
-            var name = "Charley Robson";
-            var biography = "Charley is a Rock music star.";
+            var name = "Ethan J Robson";
+            var biography = "Ethan is a Dub music star.";
 
             var updated = await _repository.UpdateArtistAsync(artistId, firstName, lastName, name, biography);
             if (updated > 0)
@@ -245,10 +243,10 @@ namespace RecordDB.Services
         {
             var artist = new Artist
             {
-                FirstName = "Andrew",
+                FirstName = "Alan",
                 LastName = "Robson",
                 Name = string.Empty,
-                Biography = "Andrew is a Country & Western star."
+                Biography = "Alan is a Jazz crooner."
             };
 
             var result = await _repository.AddArtistAsync(artist);
@@ -266,8 +264,8 @@ namespace RecordDB.Services
         private async Task AddArtistWithoutFirstNameAsync()
         {
             var firstName = string.Empty;
-            var lastName = "The Bumbles";
-            var biography = "The Bumbles are a Folk music act.";
+            var lastName = "The Wombats";
+            var biography = "The Wombats are a Rock music act.";
 
             var result = await _repository.AddArtistAsync(firstName, lastName, biography);
 
@@ -286,7 +284,7 @@ namespace RecordDB.Services
             var firstName = "Ethan";
             var lastName = "Robson";
             var name = string.Empty;
-            var biography = "Ethan is a Jazz crooner.";
+            var biography = "Ethan is a Hip-Hop star.";
 
             var result = await _repository.AddArtistAsync(firstName, lastName, biography);
 

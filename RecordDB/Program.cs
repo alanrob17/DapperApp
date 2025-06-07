@@ -60,8 +60,8 @@ namespace RecordDB
                     .Build();
 
                 await host.Services.GetRequiredService<ArtistDbService>().RunAllDatabaseOperations();
-                await host.Services.GetRequiredService<RecordDbService>().RunAllDatabaseOperations();
-                await host.Services.GetRequiredService<StatisticDbService>().RunAllDatabaseOperations();
+                //await host.Services.GetRequiredService<RecordDbService>().RunAllDatabaseOperations();
+                //await host.Services.GetRequiredService<StatisticDbService>().RunAllDatabaseOperations();
 
                 Log.Information("All database operations completed successfully");
             }
