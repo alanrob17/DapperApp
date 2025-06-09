@@ -102,10 +102,11 @@ namespace RecordDB.Repositories
         public async Task<int> GetArtistIdAsync(string firstName, string lastName)
         {
             var sproc = "up_getArtistIdByName";
-            var parameters = new DynamicParameters();
-            parameters.Add("@FirstName", firstName);
-            parameters.Add("@LastName", lastName);
-            parameters.Add("@ArtistId", 0, DbType.Int32, ParameterDirection.Output);
+            var parameters = new
+            {
+                FirstName = firstName,
+                LastName = lastName
+            };
             return await _db.GetCountOrIdAsync(sproc, parameters);
         }
 

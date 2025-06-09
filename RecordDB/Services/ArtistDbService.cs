@@ -29,7 +29,7 @@ namespace RecordDB.Services
             // await AddArtistAsync();
             // await AddArtistWithoutFirstNameAsync();
             // await AddArtistFromFieldsAsync();
-            // await CheckForArtistNameAsync("Charley Robson");
+            // await CheckForArtistNameAsync("Bob Dylan");
             // await DeleteArtistAsync(892);
             // await DeleteArtistAsync("Andrew Robson");
             // await GetArtistByFirstLastNameAsync("Bob", "Dylan");
@@ -38,9 +38,9 @@ namespace RecordDB.Services
             // await GetArtistIdFromRecordAsync(5249);
             // await GetArtistsWithNoBioAsync();
             // await GetBiographyAsync(114);
-            // await GetNoBiographyCountAsync();
+            await GetNoBiographyCountAsync();
             // await UpdateArtistAsync(896, string.Empty, "The Wompoles", "The Wompoles", "The Wompoles are a Comedy music act.");
-            await UpdateArtistAsync();
+            // await UpdateArtistAsync();
             // await GetBiographyFromRecordIdAsync(5249);
             // await GetArtistNameFromRecordIdAsync(5249);
             // await ShowArtistAsync(114);
